@@ -13,13 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('data_dummies', function (Blueprint $table) {
-            $table->id();
-            $table->integer('bulan');
-            $table->bigInteger('total_kirim');
-            $table->year('tahun');
-            $table->timestamps();
-        });
+        // Schema::create('data_dummies', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->integer('bulan');
+        //     $table->bigInteger('total_kirim');
+        //     $table->year('tahun');
+        //     $table->timestamps();
+        // });
     }
 
     /**

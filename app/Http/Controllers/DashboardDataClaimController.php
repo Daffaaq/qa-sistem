@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Yajra\DataTables\Facades\DataTables;
 
 class DashboardDataClaimController extends Controller
@@ -15,7 +16,12 @@ class DashboardDataClaimController extends Controller
         if ($request->ajax()) {
             $year = date('Y'); // Tahun sekarang otomatis, misal 2025
 
-            $query = "
+            // Cek apakah tabel data_dummies ada
+            $tableExists = Schema::hasTable('data_dummies');
+
+            if ($tableExists) {
+                // Query asli pakai data_dummies
+                $query = "
             SELECT 
                 b.bulan,
                 b.tahun,
@@ -63,10 +69,27 @@ class DashboardDataClaimController extends Controller
                 WHERE tahun = {$year}
                 GROUP BY bulan) k 
                 ON b.bulan = k.bulan
-                ORDER BY b.bulan; 
-                ";
+            ORDER BY b.bulan;
+            ";
 
-            $data = DB::select(DB::raw($query));
+                $data = DB::select(DB::raw($query));
+            } else {
+                // Jika tabel data_dummies tidak ada, set semua nilai jadi 0
+                $data = [];
+                for ($i = 1; $i <= 12; $i++) {
+                    $data[] = (object)[
+                        'bulan' => $i,
+                        'tahun' => $year,
+                        'bulan_no' => $i,
+                        'total_kirim' => 0,
+                        'ng_official' => 0,
+                        'ng_non_official' => 0,
+                        'ppm_official' => 0,
+                        'ppm_non_official' => 0,
+                        'total_ppm' => 0,
+                    ];
+                }
+            }
 
             // Array untuk konversi bulan angka ke nama bulan
             $bulanNames = [
@@ -84,7 +107,6 @@ class DashboardDataClaimController extends Controller
                 12 => 'Desember'
             ];
 
-            // Menyusun data bulan dengan memastikan semua bulan ada
             $bulanData = [];
             foreach ($bulanNames as $bulanNo => $bulanName) {
                 $bulanData[$bulanNo] = [
@@ -98,19 +120,15 @@ class DashboardDataClaimController extends Controller
                 ];
             }
 
-            // Menggabungkan data yang ada dari query dengan bulan yang sudah ada
             foreach ($data as $item) {
-                // Cek jika ng_official dan ng_non_official 0, maka atur nilai ppm menjadi 0
                 $ngOfficial = $item->ng_official;
                 $ngNonOfficial = $item->ng_non_official;
                 $totalKirim = $item->total_kirim;
 
-                // Hitung ppm hanya jika total_kirim > 0, jika tidak set menjadi 0
                 $ppmOfficial = ($totalKirim > 0) ? round(($ngOfficial * 1000000.0) / $totalKirim, 2) : 0;
                 $ppmNonOfficial = ($totalKirim > 0) ? round(($ngNonOfficial * 1000000.0) / $totalKirim, 2) : 0;
                 $totalPpm = ($totalKirim > 0) ? round((($ngOfficial + $ngNonOfficial) * 1000000.0) / $totalKirim, 2) : 0;
 
-                // Menyusun data bulan
                 $bulanData[$item->bulan] = [
                     'bulan' => $bulanNames[$item->bulan],
                     'bulan_no' => $item->bulan,
@@ -123,15 +141,15 @@ class DashboardDataClaimController extends Controller
                 ];
             }
 
-            // Membuat response sesuai dengan format DataTables
             return response()->json([
-                'draw' => (int) $request->draw, // Nomor urut permintaan
-                'recordsTotal' => count($bulanNames), // Total data yang tersedia (12 bulan)
-                'recordsFiltered' => count($bulanData), // Total data yang difilter
-                'data' => array_values($bulanData) // Data yang ditampilkan
+                'draw' => (int) $request->draw,
+                'recordsTotal' => count($bulanNames),
+                'recordsFiltered' => count($bulanData),
+                'data' => array_values($bulanData)
             ]);
         }
     }
+
 
     /**
      * Display a listing of the resource.
@@ -140,12 +158,21 @@ class DashboardDataClaimController extends Controller
      */
     public function index()
     {
-        $data = DB::table('data_dummies')
-            ->select(DB::raw('bulan, SUM(total_kirim) as total_kirim'))
-            ->groupBy('bulan')
-            ->orderBy('bulan', 'asc')  // Untuk mengurutkan bulan 1-12
-            ->get();
-        $totalKirimSemua = DB::table('data_dummies')->sum('total_kirim');
+        // Cek apakah tabel ada
+        if (Schema::hasTable('data_dummies')) {
+            $data = DB::table('data_dummies')
+                ->select(DB::raw('bulan, SUM(total_kirim) as total_kirim'))
+                ->groupBy('bulan')
+                ->orderBy('bulan', 'asc')
+                ->get();
+
+            $totalKirimSemua = DB::table('data_dummies')->sum('total_kirim');
+        } else {
+            $data = collect(); // collection kosong
+            $totalKirimSemua = 0;
+        }
+
+        // Tambahkan ini
         $totalKirimSemuaFormatted = number_format($totalKirimSemua, 0, ',', '.');
         $dataTargetPPM = 3;
         $dataCurrentPPM = 0;
@@ -208,39 +235,54 @@ class DashboardDataClaimController extends Controller
 
         // dd($ngOfficialData, $ngNonOfficialData, $bulanLabels);
         //ppm official
-        // Query untuk menghitung PPM Official per bulan
-        $ppmQuery = "
-    SELECT 
-        b.bulan,
-        COALESCE(k.total_kirim, 0) AS total_kirim,
-        COALESCE(c.Qty_NG_Official, 0) AS ng_official,
-        CASE 
-            WHEN k.total_kirim > 0 THEN ROUND((c.Qty_NG_Official * 1000000.0) / k.total_kirim, 2)
-            ELSE 0
-        END AS ppm_official
-    FROM 
-        (SELECT 1 AS bulan UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL
-         SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12) b
-    LEFT JOIN 
-        (SELECT 
-            MONTH(tanggal_claim) AS bulan, 
-            SUM(CASE WHEN kategori = 'Official' THEN quantity ELSE 0 END) AS Qty_NG_Official
-         FROM data_claims
-         WHERE YEAR(tanggal_claim) = {$year}
-         GROUP BY MONTH(tanggal_claim)) c 
-    ON b.bulan = c.bulan
-    LEFT JOIN 
-        (SELECT bulan, SUM(total_kirim) AS total_kirim
-         FROM data_dummies
-         WHERE tahun = {$year}
-         GROUP BY bulan) k 
-    ON b.bulan = k.bulan
-    ORDER BY b.bulan;
+        $tableExists = Schema::hasTable('data_dummies');
+
+        if ($tableExists) {
+            // Query asli pakai data_dummies
+            $ppmQuery = "
+        SELECT 
+            b.bulan,
+            COALESCE(k.total_kirim, 0) AS total_kirim,
+            COALESCE(c.Qty_NG_Official, 0) AS ng_official,
+            CASE 
+                WHEN k.total_kirim > 0 THEN ROUND((c.Qty_NG_Official * 1000000.0) / k.total_kirim, 2)
+                ELSE 0
+            END AS ppm_official
+        FROM 
+            (SELECT 1 AS bulan UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL
+             SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12) b
+        LEFT JOIN 
+            (SELECT 
+                MONTH(tanggal_claim) AS bulan, 
+                SUM(CASE WHEN kategori = 'Official' THEN quantity ELSE 0 END) AS Qty_NG_Official
+             FROM data_claims
+             WHERE YEAR(tanggal_claim) = {$year}
+             GROUP BY MONTH(tanggal_claim)) c 
+        ON b.bulan = c.bulan
+        LEFT JOIN 
+            (SELECT bulan, SUM(total_kirim) AS total_kirim
+             FROM data_dummies
+             WHERE tahun = {$year}
+             GROUP BY bulan) k 
+        ON b.bulan = k.bulan
+        ORDER BY b.bulan;
     ";
 
-        $ppmData = DB::select(DB::raw($ppmQuery));
+            $ppmData = DB::select(DB::raw($ppmQuery));
+        } else {
+            // Jika tabel data_dummies tidak ada, semua nilai 0
+            $ppmData = [];
+            for ($i = 1; $i <= 12; $i++) {
+                $ppmData[] = (object)[
+                    'bulan' => $i,
+                    'total_kirim' => 0,
+                    'ng_official' => 0,
+                    'ppm_official' => 0
+                ];
+            }
+        }
 
-        // Menyusun data ppm per bulan
+        // Menyusun array PPM Official per bulan
         $ppmOfficialData = [];
         foreach ($ppmData as $item) {
             $ppmOfficialData[$item->bulan] = $item->ppm_official;
