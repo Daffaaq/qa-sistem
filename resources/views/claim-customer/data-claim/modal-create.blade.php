@@ -69,7 +69,7 @@
                         <div class="col-md-6">
                             <label for="file_evident" class="form-label">Upload File Evident (jpg, png, pdf)</label>
                             <input type="file" name="file_evident" id="file_evident" class="form-control"
-                                accept=".jpg,.jpeg,.png,.pdf">
+                                accept="application/pdf">
                             <div class="invalid-feedback" id="error-file_evident"></div>
                             <small class="form-text text-muted">Opsional, maksimal 2MB.</small>
                         </div>

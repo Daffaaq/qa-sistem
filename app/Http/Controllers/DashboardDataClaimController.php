@@ -74,16 +74,32 @@ class DashboardDataClaimController extends Controller
 
                 $data = DB::select(DB::raw($query));
             } else {
-                // Jika tabel data_dummies tidak ada, set semua nilai jadi 0
+                // Ambil data dari data_claims meskipun data_dummies tidak ada
                 $data = [];
                 for ($i = 1; $i <= 12; $i++) {
+                    $claims = DB::table('data_claims')
+                        ->selectRaw('
+        COALESCE(SUM(CASE WHEN LOWER(kategori) = \'official\' THEN quantity ELSE 0 END), 0) AS ng_official, 
+        COALESCE(SUM(CASE WHEN LOWER(kategori) = \'non official\' THEN quantity ELSE 0 END), 0) AS ng_non_official
+    ')
+                        ->whereYear('tanggal_claim', $year)
+                        ->whereMonth('tanggal_claim', $i)
+                        ->first();
+
+
+
+
+                    // Menambahkan data berdasarkan hasil query
+                    $ngOfficial = $claims ? $claims->ng_official : 0;
+                    $ngNonOfficial = $claims ? $claims->ng_non_official : 0;
+
                     $data[] = (object)[
                         'bulan' => $i,
                         'tahun' => $year,
                         'bulan_no' => $i,
-                        'total_kirim' => 0,
-                        'ng_official' => 0,
-                        'ng_non_official' => 0,
+                        'total_kirim' => 0, // Karena data_dummies tidak ada, set total_kirim 0
+                        'ng_official' => $ngOfficial,
+                        'ng_non_official' => $ngNonOfficial,
                         'ppm_official' => 0,
                         'ppm_non_official' => 0,
                         'total_ppm' => 0,
