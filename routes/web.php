@@ -12,6 +12,7 @@ use App\Http\Controllers\CustomerAuditController;
 use App\Http\Controllers\DashboardDataClaimController;
 use App\Http\Controllers\DataClaimController;
 use App\Http\Controllers\ManagementRepresentativeController;
+use App\Http\Controllers\PPICController;
 use App\Http\Controllers\UserController;
 
 /*
@@ -124,6 +125,36 @@ Route::group(
             Route::get('management-representative/{form}/revisi-form-data', [ManagementRepresentativeController::class, 'revisiForm'])->name('management-representative.revisi-form');
             Route::post('management-representative/{form}/revisi-form', [ManagementRepresentativeController::class, 'reviseForm'])->name('management-representative.revise-form');
             Route::get('management-representative/revisi-all', [ManagementRepresentativeController::class, 'showAllRevisions'])->name('management-representative.revisi-show');
+
+            // ppic
+            Route::get('ppic/count-sop', [PPICController::class, 'countSop'])->name('ppic.count-sop');
+            Route::get('ppic/count-wi', [PPICController::class, 'countWi'])->name('ppic.count-wi');
+            Route::get('ppic/count-form', [PPICController::class, 'countForm'])->name('ppic.count-form');
+            Route::get('ppic/count-all', [PPICController::class, 'countAll'])->name('ppic.count-all');
+            Route::get('ppic', [PPICController::class, 'index'])->name('ppic.index');
+            Route::get('ppic/sop-list-partial', [PPICController::class, 'contentListPartial'])->name('ppic.content-list-partial');
+
+            Route::post('ppic/store-sop', [PPICController::class, 'storeSop'])->name('ppic.store-sop');
+            Route::get('ppic/{sop}/edit-sop', [PPICController::class, 'editSop'])->name('ppic.edit-sop');
+            Route::put('ppic/{sop}/update-sop', [PPICController::class, 'updateSop'])->name('ppic.update-sop');
+            Route::delete('ppic/{sop}/destroy-sop', [PPICController::class, 'destroySop'])->name('ppic.destroy-sop');
+            Route::get('ppic/{sop}/revisi-sop-data', [PPICController::class, 'revisiSOP'])->name('ppic.revisi-sop');
+            Route::post('ppic/{sop}/revisi-sop', [PPICController::class, 'reviseSOP'])->name('ppic.revise-sop');
+
+            Route::post('ppic/{sop}/store-wi', [PPICController::class, 'storeWI'])->name('ppic.store-wi');
+            Route::get('ppic/{wi}/edit-wi', [PPICController::class, 'editWI'])->name('ppic.edit-wi');
+            Route::put('ppic/{wi}/update-wi', [PPICController::class, 'updateWI'])->name('ppic.update-wi');
+            Route::delete('ppic/{wi}/destroy-wi', [PPICController::class, 'destroyWI'])->name('ppic.destroy-wi');
+            Route::get('ppic/{wi}/revisi-wi-data', [PPICController::class, 'revisiWI'])->name('ppic.revisi-wi');
+            Route::post('ppic/{wi}/revisi-wi', [PPICController::class, 'reviseWI'])->name('ppic.revise-wi');
+
+            Route::post('ppic/{wi}/store-form', [PPICController::class, 'storeForm'])->name('ppic.store-form');
+            Route::get('ppic/{form}/edit-form', [PPICController::class, 'editForm'])->name('ppic.edit-form');
+            Route::put('ppic/{form}/update-form', [PPICController::class, 'updateForm'])->name('ppic.update-form');
+            Route::delete('ppic/{form}/destroy-form', [PPICController::class, 'destroyForm'])->name('ppic.destroy-form');
+            Route::get('ppic/{form}/revisi-form-data', [PPICController::class, 'revisiForm'])->name('ppic.revisi-form');
+            Route::post('ppic/{form}/revisi-form', [PPICController::class, 'reviseForm'])->name('ppic.revise-form');
+            Route::get('ppic/revisi-all', [PPICController::class, 'showAllRevisions'])->name('ppic.revisi-show');
         });
 
         Route::prefix('claim-customer')->group(function () {
