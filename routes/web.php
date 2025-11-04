@@ -11,6 +11,7 @@ use App\Http\Controllers\CalenderAuditController;
 use App\Http\Controllers\CustomerAuditController;
 use App\Http\Controllers\DashboardDataClaimController;
 use App\Http\Controllers\DataClaimController;
+use App\Http\Controllers\ManagementRepresentativeController;
 use App\Http\Controllers\UserController;
 
 /*
@@ -92,9 +93,37 @@ Route::group(
             Route::delete('qa-qc/{form}/destroy-form', [QAQCController::class, 'destroyForm'])->name('qa-qc.destroy-form');
             Route::get('qa-qc/{form}/revisi-form-data', [QAQCController::class, 'revisiForm'])->name('qa-qc.revisi-form');
             Route::post('qa-qc/{form}/revisi-form', [QAQCController::class, 'reviseForm'])->name('qa-qc.revise-form');
-
-            // Show all revisions
             Route::get('qa-qc/revisi-all', [QAQCController::class, 'showAllRevisions'])->name('qa-qc.revisi-show');
+
+            // management-representative
+            Route::get('management-representative/count-sop', [ManagementRepresentativeController::class, 'countSop'])->name('management-representative.count-sop');
+            Route::get('management-representative/count-wi', [ManagementRepresentativeController::class, 'countWi'])->name('management-representative.count-wi');
+            Route::get('management-representative/count-form', [ManagementRepresentativeController::class, 'countForm'])->name('management-representative.count-form');
+            Route::get('management-representative/count-all', [ManagementRepresentativeController::class, 'countAll'])->name('management-representative.count-all');
+            Route::get('management-representative', [ManagementRepresentativeController::class, 'index'])->name('management-representative.index');
+            Route::get('management-representative/sop-list-partial', [ManagementRepresentativeController::class, 'contentListPartial'])->name('management-representative.content-list-partial');
+
+            Route::post('management-representative/store-sop', [ManagementRepresentativeController::class, 'storeSop'])->name('management-representative.store-sop');
+            Route::get('management-representative/{sop}/edit-sop', [ManagementRepresentativeController::class, 'editSop'])->name('management-representative.edit-sop');
+            Route::put('management-representative/{sop}/update-sop', [ManagementRepresentativeController::class, 'updateSop'])->name('management-representative.update-sop');
+            Route::delete('management-representative/{sop}/destroy-sop', [ManagementRepresentativeController::class, 'destroySop'])->name('management-representative.destroy-sop');
+            Route::get('management-representative/{sop}/revisi-sop-data', [ManagementRepresentativeController::class, 'revisiSOP'])->name('management-representative.revisi-sop');
+            Route::post('management-representative/{sop}/revisi-sop', [ManagementRepresentativeController::class, 'reviseSOP'])->name('management-representative.revise-sop');
+
+            Route::post('management-representative/{sop}/store-wi', [ManagementRepresentativeController::class, 'storeWI'])->name('management-representative.store-wi');
+            Route::get('management-representative/{wi}/edit-wi', [ManagementRepresentativeController::class, 'editWI'])->name('management-representative.edit-wi');
+            Route::put('management-representative/{wi}/update-wi', [ManagementRepresentativeController::class, 'updateWI'])->name('management-representative.update-wi');
+            Route::delete('management-representative/{wi}/destroy-wi', [ManagementRepresentativeController::class, 'destroyWI'])->name('management-representative.destroy-wi');
+            Route::get('management-representative/{wi}/revisi-wi-data', [ManagementRepresentativeController::class, 'revisiWI'])->name('management-representative.revisi-wi');
+            Route::post('management-representative/{wi}/revisi-wi', [ManagementRepresentativeController::class, 'reviseWI'])->name('management-representative.revise-wi');
+
+            Route::post('management-representative/{wi}/store-form', [ManagementRepresentativeController::class, 'storeForm'])->name('management-representative.store-form');
+            Route::get('management-representative/{form}/edit-form', [ManagementRepresentativeController::class, 'editForm'])->name('management-representative.edit-form');
+            Route::put('management-representative/{form}/update-form', [ManagementRepresentativeController::class, 'updateForm'])->name('management-representative.update-form');
+            Route::delete('management-representative/{form}/destroy-form', [ManagementRepresentativeController::class, 'destroyForm'])->name('management-representative.destroy-form');
+            Route::get('management-representative/{form}/revisi-form-data', [ManagementRepresentativeController::class, 'revisiForm'])->name('management-representative.revisi-form');
+            Route::post('management-representative/{form}/revisi-form', [ManagementRepresentativeController::class, 'reviseForm'])->name('management-representative.revise-form');
+            Route::get('management-representative/revisi-all', [ManagementRepresentativeController::class, 'showAllRevisions'])->name('management-representative.revisi-show');
         });
 
         Route::prefix('claim-customer')->group(function () {

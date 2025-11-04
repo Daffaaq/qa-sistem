@@ -109,21 +109,6 @@
             });
         }
 
-        $('#prevPageEditForm').on('click', function() {
-            if (currentPageEditForm > 1) {
-                currentPageEditForm--;
-                renderPageEditForm(currentPageEditForm);
-            }
-        });
-
-        // Fungsi untuk navigasi ke halaman berikutnya
-        $('#nextPageEditForm').on('click', function() {
-            if (currentPageEditForm < pdfDocEditForm.numPages) {
-                currentPageEditForm++;
-                renderPageEditForm(currentPageEditForm);
-            }
-        });
-
         // Function to load the PDF
         function loadPDFEditForm(fileUrl) {
             pdfDocEditForm = null;
@@ -153,29 +138,47 @@
             });
         }
 
+        // Fungsi untuk navigasi ke halaman sebelumnya
+        $('#prevPageEditForm').on('click', function() {
+            if (currentPageEditForm > 1) {
+                currentPageEditForm--;
+                renderPageEditForm(currentPageEditForm);
+            }
+        });
+
+        // Fungsi untuk navigasi ke halaman berikutnya
+        $('#nextPageEditForm').on('click', function() {
+            if (currentPageEditForm < pdfDocEditForm.numPages) {
+                currentPageEditForm++;
+                renderPageEditForm(currentPageEditForm);
+            }
+        });
+
         // Open modal and load the PDF for editing
         $(document).on('click', '.btn-edit-form', function(e) {
             e.preventDefault();
 
             const formId = $(this).data('form-id');
 
-            $.get("{{ route('qa-qc.edit-form', ':formId') }}".replace(':formId', formId), function(data) {
-                $('#edit_form_id').val(formId);
-                $('#edit_form_title_document').val(data.title_document);
+            $.get("{{ route('management-representative.edit-form', ':formId') }}".replace(':formId', formId),
+                function(data) {
+                    $('#edit_form_id').val(formId);
+                    $('#edit_form_title_document').val(data.title_document);
 
-                if (data.file_document) {
-                    const fileUrl = `${window.BASE_URL}/${data.file_document}`;
-                    loadPDFEditForm(fileUrl);
-                    $('#current-form-file-info').show();
-                } else {
-                    $('#current-form-file-info').hide();
-                }
+                    if (data.file_document) {
+                        const fileUrl = `${window.BASE_URL}/${data.file_document}`;
+                        loadPDFEditForm(fileUrl);
+                        $('#current-form-file-info').show();
+                    } else {
+                        $('#current-form-file-info').hide();
+                    }
 
-                $('#formEditForm').attr('action', "{{ route('qa-qc.update-form', ':formId') }}".replace(
-                    ':formId', formId));
+                    $('#formEditForm').attr('action',
+                        "{{ route('management-representative.update-form', ':formId') }}".replace(
+                            ':formId', formId));
 
-                $('#modalEditForm').modal('show');
-            });
+                    $('#modalEditForm').modal('show');
+                });
         });
 
         $('#formEditForm').on('submit', function(e) {
@@ -207,10 +210,10 @@
                         $('#modalEditForm').modal('hide');
                         // Reload list SOP (partial)
                         $.ajax({
-                            url: "{{ route('qa-qc.content-list-partial') }}",
+                            url: "{{ route('management-representative.content-list-partial') }}",
                             method: 'GET',
                             success: function(html) {
-                                $('#sop-list-container').html(html);
+                                $('#sop-rep-list-container').html(html);
                                 initTreeToggle(); // <<< ini WAJIB ditambahkan
                             },
                             error: function() {
