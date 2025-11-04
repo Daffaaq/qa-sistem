@@ -100,6 +100,10 @@
                 } else {
                     if (category === 'QA QC') {
                         url = `${window.BASE_URL}/qa-qc/${file}`;
+                    } else if (category === 'PPIC') {
+                        url = `${window.BASE_URL}/ppic/${file}`;
+                    } else if (category === 'Management Representative') {
+                        url = `${window.BASE_URL}/management-representative/${file}`;
                     }
                     // Lainnya bisa handle nanti
                 }
