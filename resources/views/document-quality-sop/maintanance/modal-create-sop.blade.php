@@ -19,7 +19,7 @@
                         <input type="text" name="title_document" id="title_document_sop_rep" class="form-control">
                         <div class="invalid-feedback" id="error-title_document"></div>
                         <small class="form-text text-muted">
-                            Maksimal 255 karakter. Contoh: "SOP Management Representative PT IPG Tahun 2025".
+                            Maksimal 255 karakter. Contoh: "SOP IRGA PT IPG Tahun 2025".
                         </small>
                     </div>
 
