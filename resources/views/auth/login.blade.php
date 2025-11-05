@@ -154,9 +154,19 @@
                                     <h2 class="login-title text-center">LOGIN</h2>
 
                                     <p class="text-muted mb-4">Please enter your credentials to access the system</p>
-                                    @if (session('loginError'))
-                                        <div class="alert alert-danger">
-                                            {{ session('loginError') }}
+                                    @if (session('logoutSuccess'))
+                                        <div class="alert alert-success text-center py-1 mb-2 small" role="alert"
+                                            id="logoutAlert">
+                                            <i class="ti ti-check-circle"></i>
+                                            {{ session('logoutSuccess') }}
+                                        </div>
+                                    @endif
+
+                                    @if (session('loginFailed'))
+                                        <div class="alert alert-danger text-center py-1 mb-2 small" role="alert"
+                                            id="loginFailedAlert">
+                                            <i class="ti ti-alert-circle"></i>
+                                            {{ session('loginFailed') }}
                                         </div>
                                     @endif
                                     <div class="mb-3">
@@ -210,14 +220,17 @@
             });
         @endif
 
-        @if (session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal!',
-                text: '{{ session('error') }}',
-                timer: 2000,
-                showConfirmButton: false
-            });
-        @endif
+
+        setTimeout(function() {
+            const logoutAlert = document.getElementById('logoutAlert');
+            if (logoutAlert) {
+                logoutAlert.style.display = 'none';
+            }
+
+            const loginFailedAlert = document.getElementById('loginFailedAlert');
+            if (loginFailedAlert) {
+                loginFailedAlert.style.display = 'none';
+            }
+        }, 5000);
     </script>
 </body>

@@ -27,7 +27,7 @@ class LoginController extends Controller
             return back()->with('loginSuccess', 'Login berhasil!');
         }
 
-        return back()->with('error', 'Email atau password salah.')->withInput();
+        return back()->with('loginFailed', 'Email atau password salah.')->withInput();
     }
 
     public function logout(Request $request)
