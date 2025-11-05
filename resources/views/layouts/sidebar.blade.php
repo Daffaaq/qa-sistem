@@ -73,7 +73,7 @@
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a href="{{route('management-representative.index')}}" class="sidebar-link">
+                            <a href="{{ route('management-representative.index') }}" class="sidebar-link">
                                 <div class="round-16 d-flex align-items-center justify-content-center">
                                     <i class="ti ti-circle"></i>
                                 </div>
@@ -89,7 +89,7 @@
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a href="#" class="sidebar-link">
+                            <a href="{{ route('maintanance.index') }}" class="sidebar-link">
                                 <div class="round-16 d-flex align-items-center justify-content-center">
                                     <i class="ti ti-circle"></i>
                                 </div>
