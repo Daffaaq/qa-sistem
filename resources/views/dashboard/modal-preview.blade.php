@@ -100,10 +100,28 @@
                 } else {
                     if (category === 'QA QC') {
                         url = `${window.BASE_URL}/qa-qc/${file}`;
+                    } else if (category === 'Management Representative') {
+                        url = `${window.BASE_URL}/representative/${file}`;
                     } else if (category === 'PPIC') {
                         url = `${window.BASE_URL}/ppic/${file}`;
-                    } else if (category === 'Management Representative') {
-                        url = `${window.BASE_URL}/management-representative/${file}`;
+                    } else if (category === 'Maintanance') {
+                        url = `${window.BASE_URL}/maintanance/${file}`;
+                    } else if (category === 'Human Capital') {
+                        url = `${window.BASE_URL}/human-capital/${file}`;
+                    } else if (category === 'Engineering') {
+                        url = `${window.BASE_URL}/engineering/${file}`;
+                    } else if (category === 'IRGA') {
+                        url = `${window.BASE_URL}/irga/${file}`;
+                    } else if (category === 'SHE') {
+                        url = `${window.BASE_URL}/she/${file}`;
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Kategori tidak dikenali',
+                            text: `Kategori "${category}" belum memiliki folder yang ditentukan.`,
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#d33',
+                        });
                     }
                     // Lainnya bisa handle nanti
                 }
@@ -112,13 +130,24 @@
 
                 scale = 1.0;
                 currentPage = 1;
-
+                if (!url) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'File tidak ditemukan',
+                        text: 'URL file PDF tidak valid.',
+                    });
+                    return;
+                }
                 pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
                     pdfDoc = pdfDoc_;
                     pageCountText.textContent = pdfDoc.numPages;
                     renderPage(currentPage);
                 }).catch(err => {
-                    alert('Gagal memuat dokumen PDF: ' + err.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal memuat dokumen PDF',
+                        text: err.message,
+                    });
                     bootstrap.Modal.getInstance(modalPDF).hide();
                 });
             });
