@@ -5,7 +5,7 @@
             <form method="POST" enctype="multipart/form-data" id="formReviseSOP">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalReviseSOPLabel">Revisi Dokumen SOP Maintanance</h5>
+                    <h5 class="modal-title" id="modalReviseSOPLabel">Revisi Dokumen SOP Management Engineering</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
@@ -80,11 +80,11 @@
             const sopId = $(this).data('sop-id');
             $('#revise_sop_id').val(sopId);
 
-            const actionUrl = `{{ route('maintanance.revise-sop', ':id') }}`.replace(':id', sopId);
+            const actionUrl = `{{ route('engineering.revise-sop', ':id') }}`.replace(':id', sopId);
             $('#formReviseSOP').attr('action', actionUrl);
 
             // Ambil data judul & file aktif dari server
-            $.get("{{ route('maintanance.revisi-sop', ':id') }}".replace(':id', sopId), function(data) {
+            $.get("{{ route('engineering.revisi-sop', ':id') }}".replace(':id', sopId), function(data) {
                 $('#title_document_revise').val(data.title_document || '');
 
                 // Tampilkan PDF preview jika ada file
@@ -211,12 +211,12 @@
                         $('#modalReviseSOP').modal('hide');
 
                         // Refresh count & list
-                        $.get("{{ route('maintanance.count-sop') }}", function(res) {
+                        $.get("{{ route('engineering.count-sop') }}", function(res) {
                             $('#total-documents-sop-rep').text(res.sopCount);
                         });
 
                         $.ajax({
-                            url: "{{ route('maintanance.content-list-partial') }}",
+                            url: "{{ route('engineering.content-list-partial') }}",
                             method: 'GET',
                             success: function(html) {
                                 $('#sop-rep-list-container').html(html);

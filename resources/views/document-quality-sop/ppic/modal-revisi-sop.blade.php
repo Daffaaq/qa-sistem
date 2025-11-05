@@ -5,7 +5,7 @@
             <form method="POST" enctype="multipart/form-data" id="formReviseSOP">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalReviseSOPLabel">Revisi Dokumen SOP Management Representative</h5>
+                    <h5 class="modal-title" id="modalReviseSOPLabel">Revisi Dokumen SOP PPIC</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
