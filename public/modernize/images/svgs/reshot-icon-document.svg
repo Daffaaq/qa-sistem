@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 64 64" style="enable-background:new 0 0 64 64;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#FFFFFF;}
+	.st1{fill:#ACBDC5;}
+	.st2{fill-rule:evenodd;clip-rule:evenodd;fill:#314A52;}
+</style>
+<g id="Document">
+	<polygon class="st0" points="11,3 40,3 53,16 53,53 11,53 	"/>
+	<path class="st1" d="M14,4c-1.1,0-2,0.9-2,2v40c0,3.3,5.4,6,12,6c6.3,0,12.1-1.5,16.8-4H32v-4h14.4c3.5-3.3,5.6-7.5,5.6-12h1v29
+		l-5,3H14c-3.3,0-6-2.7-6-6V6c0-3.3,2.7-6,6-6h24.5c2.1,0,4.2,0.8,5.7,2.3l9.5,9.5c1.5,1.5,2.3,3.5,2.3,5.7V22l-4,2.5
+		c-0.1-4-3-7.4-7-8.6L43,13V6.8l-1.7-1.7C40.6,4.4,39.6,4,38.5,4H14z M16,16h12v-4H16V16z M24,24h20v-4H24V24z M16,32h28v-4H16V32z
+		 M16,40h20v-4H16V40z"/>
+	<path class="st2" d="M20,0h18c3.3,0,6,2.7,6,6v4c0,1.1,0.9,2,2,2h4c3.3,0,6,2.7,6,6v40c0,3.3-2.7,6-6,6h-6v-4h6c1.1,0,2-0.9,2-2V18
+		c0-1.1-0.9-2-2-2h-4c-3.3,0-6-2.7-6-6V6c0-1.1-0.9-2-2-2H20V0z"/>
+</g>
+</svg>

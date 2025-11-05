@@ -5,13 +5,27 @@
         <!--  Owl carousel -->
         <div class="owl-carousel counter-carousel owl-theme">
             <div class="item">
-                <div class="card border-0 zoom-in bg-light-primary shadow-none">
+                <div class="card border-0 zoom-in bg-light-warning shadow-none">
                     <div class="card-body">
                         <div class="text-center">
-                            <img src="{{ asset('modernize/images/svgs/icon-user-male.svg') }}" width="50" height="50"
+                            <img src="{{ asset('modernize/images/svgs/icons8-document.svg') }}" width="50" height="50"
                                 class="mb-3" alt="" />
-                            <p class="fw-semibold fs-3 text-primary mb-1">Manual Mutu</p>
-                            <h5 class="fw-semibold text-primary mb-0 count-up" data-count="{{ $documentManualMutu }}">0</h5>
+                            <p class="fw-semibold fs-3 text-warning mb-1">Manual Mutu</p>
+                            <h5 class="fw-semibold text-warning mb-0 count-up" data-count="{{ $documentManualMutu }}">0</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="card border-0 zoom-in bg-light-info shadow-none">
+                    <div class="card-body">
+                        <div class="text-center">
+                            <img src="{{ asset('modernize/images/svgs/icons-document.svg') }}" width="50" height="50"
+                                class="mb-3" alt="" />
+                            <p class="fw-semibold fs-3 text-info mb-1">Customer</p>
+                            <h5 class="fw-semibold text-info mb-0 count-up" data-count="{{ $documentSQAMCustomer }}">0
+                            </h5>
                         </div>
                     </div>
                 </div>
@@ -21,10 +35,10 @@
                 <div class="card border-0 zoom-in bg-light-warning shadow-none">
                     <div class="card-body">
                         <div class="text-center">
-                            <img src="{{ asset('modernize/images/svgs/icon-book-open.svg') }}" width="50" height="50"
-                                class="mb-3" alt="" />
-                            <p class="fw-semibold fs-3 text-warning mb-1">Customer</p>
-                            <h5 class="fw-semibold text-warning mb-0 count-up" data-count="{{ $documentSQAMCustomer }}">0
+                            <img src="{{ asset('modernize/images/svgs/reshot-icon-file-document.svg') }}" width="50"
+                                height="50" class="mb-3" alt="" />
+                            <p class="fw-semibold fs-3 text-warning mb-1">Supplier</p>
+                            <h5 class="fw-semibold text-warning mb-0 count-up" data-count="{{ $documentSQAMSupplier }}">0
                             </h5>
                         </div>
                     </div>
@@ -35,36 +49,82 @@
                 <div class="card border-0 zoom-in bg-light-danger shadow-none">
                     <div class="card-body">
                         <div class="text-center">
-                            <img src="{{ asset('modernize/images/svgs/booklet.svg') }}" width="50" height="50"
-                                class="mb-3" alt="" />
-                            <p class="fw-semibold fs-3 text-danger mb-1">Supplier</p>
-                            <h5 class="fw-semibold text-danger mb-0 count-up" data-count="{{ $documentSQAMSupplier }}">0
-                            </h5>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="card border-0 zoom-in bg-light-danger shadow-none">
-                    <div class="card-body">
-                        <div class="text-center">
-                            <img src="{{ asset('modernize/images/svgs/icon-favorites.svg') }}" width="50" height="50"
-                                class="mb-3" alt="" />
+                            <img src="{{ asset('modernize/images/svgs/reshot-icon-documents-file.svg') }}" width="50"
+                                height="50" class="mb-3" alt="" />
                             <p class="fw-semibold fs-3 text-danger mb-1">QA QC</p>
                             <h5 class="fw-semibold text-danger mb-0 count-up" data-count="{{ $qaqc }}">0</h5>
                         </div>
                     </div>
                 </div>
             </div>
-            {{-- <div class="item">
+            <div class="item">
+                <div class="card border-0 zoom-in bg-light-warning shadow-none">
+                    <div class="card-body">
+                        <div class="text-center">
+                            <img src="{{ asset('modernize/images/svgs/reshot-icon-data-files.svg') }}" width="50"
+                                height="50" class="mb-3" alt="" />
+                            <p class="fw-semibold fs-3 text-warning mb-1">MAN REP</p>
+                            <h5 class="fw-semibold text-warning mb-0 count-up" data-count="{{ $manRep }}">0</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
                 <div class="card border-0 zoom-in bg-light-success shadow-none">
                     <div class="card-body">
                         <div class="text-center">
-                            <img src="{{ asset('modernize/images/svgs/icon-speech-bubble.svg') }}" width="50"
+                            <img src="{{ asset('modernize/images/svgs/reshot-icon-file-attachment.svg') }}" width="50"
                                 height="50" class="mb-3" alt="" />
-                            <p class="fw-semibold fs-3 text-success mb-1">Payroll</p>
-                            <h5 class="fw-semibold text-success mb-0 count-up" data-count="{{ 100 }}">0</h5>
+                            <p class="fw-semibold fs-3 text-success mb-1">PPIC</p>
+                            <h5 class="fw-semibold text-success mb-0 count-up" data-count="{{ $ppic }}">0</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="card border-0 zoom-in bg-light-primary shadow-none">
+                    <div class="card-body">
+                        <div class="text-center">
+                            <img src="{{ asset('modernize/images/svgs/document-file-file-type-page-paper-sheet.svg') }}"
+                                width="50" height="50" class="mb-3" alt="" />
+                            <p class="fw-semibold fs-3 text-primary mb-1">Maintanance</p>
+                            <h5 class="fw-semibold text-primary mb-0 count-up" data-count="{{ $maintanance }}">0</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="card border-0 zoom-in bg-light-warning shadow-none">
+                    <div class="card-body">
+                        <div class="text-center">
+                            <img src="{{ asset('modernize/images/svgs/document-file-script.svg') }}" width="50"
+                                height="50" class="mb-3" alt="" />
+                            <p class="fw-semibold fs-3 text-warning mb-1">HC</p>
+                            <h5 class="fw-semibold text-warning mb-0 count-up" data-count="{{ $humanCapital }}">0</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="card border-0 zoom-in bg-light-danger shadow-none">
+                    <div class="card-body">
+                        <div class="text-center">
+                            <img src="{{ asset('modernize/images/svgs/reshot-icon-document.svg') }}" width="50"
+                                height="50" class="mb-3" alt="" />
+                            <p class="fw-semibold fs-3 text-danger mb-1">Engineering</p>
+                            <h5 class="fw-semibold text-danger mb-0 count-up" data-count="{{ $engineering }}">0</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="card border-0 zoom-in bg-light-success shadow-none">
+                    <div class="card-body">
+                        <div class="text-center">
+                            <img src="{{ asset('modernize/images/svgs/reshot-icon-documents.svg') }}" width="50"
+                                height="50" class="mb-3" alt="" />
+                            <p class="fw-semibold fs-3 text-success mb-1">IRGA</p>
+                            <h5 class="fw-semibold text-success mb-0 count-up" data-count="{{ $irga }}">0</h5>
                         </div>
                     </div>
                 </div>
@@ -73,14 +133,14 @@
                 <div class="card border-0 zoom-in bg-light-info shadow-none">
                     <div class="card-body">
                         <div class="text-center">
-                            <img src="{{ asset('modernize/images/svgs/icon-connect.svg') }}" width="50" height="50"
-                                class="mb-3" alt="" />
-                            <p class="fw-semibold fs-3 text-info mb-1">Reports</p>
-                            <h5 class="fw-semibold text-info mb-0 count-up" data-count="{{ 59 }}">0</h5>
+                            <img src="{{ asset('modernize/images/svgs/file-document.svg') }}" width="50"
+                                height="50" class="mb-3" alt="" />
+                            <p class="fw-semibold fs-3 text-info mb-1">SHE</p>
+                            <h5 class="fw-semibold text-info mb-0 count-up" data-count="{{ $she }}">0</h5>
                         </div>
                     </div>
                 </div>
-            </div> --}}
+            </div>
         </div>
 
         <!--  Row 1 -->
@@ -281,7 +341,7 @@
                                                     data-bs-toggle="modal" data-bs-target="#modalPreviewPDF"
                                                     data-title="{{ optional($file->title)->title_document }}"
                                                     data-file="{{ $file->file }}" data-type="{{ $file->type }}"
-                                                    data-category="{{ $file->category}}"                                                    
+                                                    data-category="{{ $file->category }}"
                                                     data-folder="{{ $file->folder }}" title="Lihat File">
                                                     <i class="fas fa-file" data-bs-toggle="tooltip"
                                                         data-bs-placement="top" title="Lihat File"></i>

@@ -26,6 +26,76 @@ class DashboardController extends Controller
 
         $qaqc = $sopCount + $wiCount + $formCount;
 
+        $sopRep = Sop::whereHas('document', function ($query) {
+            $query->where('category_document', 'Management Representative');
+        })->with(['wis.forms'])->get();
+
+        $sopCountRep = $sopRep->count();
+        $wiCountRep = $sopRep->sum(fn($sop) => $sop->wis->count());
+        $formCountRep = $sopRep->sum(fn($sop) => $sop->wis->sum(fn($wi) => $wi->forms->count()));
+
+        $manRep = $sopCountRep + $wiCountRep + $formCountRep;
+
+        $sopPPIC = Sop::whereHas('document', function ($query) {
+            $query->where('category_document', 'PPIC');
+        })->with(['wis.forms'])->get();
+
+        $sopCountPPIC = $sopPPIC->count();
+        $wiCountPPIC = $sopPPIC->sum(fn($sop) => $sop->wis->count());
+        $formCountPPIC = $sopPPIC->sum(fn($sop) => $sop->wis->sum(fn($wi) => $wi->forms->count()));
+
+        $ppic = $sopCountPPIC + $wiCountPPIC + $formCountPPIC;
+
+        $sopMaintanance = Sop::whereHas('document', function ($query) {
+            $query->where('category_document', 'Maintanance');
+        })->with(['wis.forms'])->get();
+
+        $sopCountMaintanance = $sopMaintanance->count();
+        $wiCountMaintanance = $sopMaintanance->sum(fn($sop) => $sop->wis->count());
+        $formCountMaintanance = $sopMaintanance->sum(fn($sop) => $sop->wis->sum(fn($wi) => $wi->forms->count()));
+
+        $maintanance = $sopCountMaintanance + $wiCountMaintanance + $formCountMaintanance;
+
+        $sopHumanCapital = Sop::whereHas('document', function ($query) {
+            $query->where('category_document', 'Human Capital');
+        })->with(['wis.forms'])->get();
+
+        $sopCountHumanCapital = $sopHumanCapital->count();
+        $wiCountHumanCapital = $sopHumanCapital->sum(fn($sop) => $sop->wis->count());
+        $formCountHumanCapital = $sopHumanCapital->sum(fn($sop) => $sop->wis->sum(fn($wi) => $wi->forms->count()));
+
+        $humanCapital = $sopCountHumanCapital + $wiCountHumanCapital + $formCountHumanCapital;
+
+        $sopEngineering = Sop::whereHas('document', function ($query) {
+            $query->where('category_document', 'Engineering');
+        })->with(['wis.forms'])->get();
+        
+        $sopCountEngineering = $sopEngineering->count();
+        $wiCountEngineering = $sopEngineering->sum(fn($sop) => $sop->wis->count());
+        $formCountEngineering = $sopEngineering->sum(fn($sop) => $sop->wis->sum(fn($wi) => $wi->forms->count()));
+
+        $engineering = $sopCountEngineering + $wiCountEngineering + $formCountEngineering;
+
+        $sopIRGA = Sop::whereHas('document', function ($query) {
+            $query->where('category_document', 'IRGA');
+        })->with(['wis.forms'])->get();
+
+        $sopCountIRGA = $sopIRGA->count();
+        $wiCountIRGA = $sopIRGA->sum(fn($sop) => $sop->wis->count());
+        $formCountIRGA = $sopIRGA->sum(fn($sop) => $sop->wis->sum(fn($wi) => $wi->forms->count()));
+
+        $irga = $sopCountIRGA + $wiCountIRGA + $formCountIRGA;
+
+        $sopSHE = Sop::whereHas('document', function ($query) {
+            $query->where('category_document', 'SHE');
+        })->with(['wis.forms'])->get();
+
+        $sopCountSHE = $sopSHE->count();
+        $wiCountSHE = $sopSHE->sum(fn($sop) => $sop->wis->count());
+        $formCountSHE = $sopSHE->sum(fn($sop) => $sop->wis->sum(fn($wi) => $wi->forms->count()));
+
+        $she = $sopCountSHE + $wiCountSHE + $formCountSHE;
+
         // Collect data and sort it
         $documentCounts = [
             ['name' => 'Manual Mutu', 'count' => $documentManualMutu],
@@ -466,6 +536,13 @@ class DashboardController extends Controller
                 'documentSQAMCustomer',
                 'documentSQAMSupplier',
                 'qaqc',
+                'manRep',
+                'ppic',
+                'maintanance',
+                'humanCapital',
+                'engineering',
+                'irga',
+                'she',
                 'categories',
                 'selectedCategory',
                 'allFiles',

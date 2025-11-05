@@ -21,7 +21,7 @@ class DataClaimSeeder extends Seeder
         $tahun = 2025;  // Tentukan tahun yang diinginkan
 
         // Loop untuk setiap bulan dari Januari (bulan 1) hingga Oktober (bulan 10)
-        for ($bulan = 1; $bulan <= 10; $bulan++) {
+        for ($bulan = 1; $bulan <= 12; $bulan++) {
             // Menentukan jumlah hari dalam bulan tersebut
             $jumlahHari = cal_days_in_month(CAL_GREGORIAN, $bulan, $tahun);
 
