@@ -54,6 +54,7 @@
                                     <th>Tanggal Mulai Event</th>
                                     <th>Tanggal Selesai Event</th>
                                     <th>File Evident</th>
+                                    <th>Data Audit</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -71,6 +72,7 @@
     @include('customer-audit.data-customer-audit.modal-edit')
     @include('customer-audit.data-customer-audit.modal-show')
     @include('customer-audit.data-customer-audit.modal-preview')
+    @include('customer-audit.data-audit.data-audit-edit')
 @endsection
 
 @push('styles')
@@ -99,10 +101,14 @@
 @push('scripts')
     <script>
         window.BASE_URL = "{{ asset('documents/customer-audit') }}"; // Using asset() for correct path generation
+        window.DATA_AUDIT_BASE_URL = "{{ asset('documents/data-audit') }}";
     </script>
     <script>
         let dataCustomerAuditTable;
         window.USER_ROLE = "{{ Auth::user()->role }}";
+        window.ROUTES = {
+            dataAuditList: "{{ route('customer-audit.data-audit-list', ':id') }}"
+        };
         $(document).ready(function() {
             dataCustomerAuditTable = $('#data-customer-audit-table').DataTable({
                 processing: true,
@@ -149,6 +155,35 @@
                             return '-';
                         }
                     },
+
+                    {
+                        data: 'id',
+                        name: 'data_audit',
+                        render: function(id, type, row) {
+                            const url = "{{ route('customer-audit.data-audit-form', ':id') }}"
+                                .replace(':id', id);
+
+                            let addBtn = `
+        <a href="${url}" class="btn btn-sm btn-primary">
+            <i class="ti ti-plus"></i> Add Data Audit
+        </a>
+    `;
+
+                            // Tombol expand hanya muncul kalau ada data audit
+                            let expandBtn = '';
+                            if (row.has_audit) {
+                                expandBtn = `
+            <button class="btn btn-sm btn-success btn-expand-data-audit" data-id="${id}">
+                <i class="ti ti-database"></i> Data Audit
+            </button>
+        `;
+                            }
+
+                            return addBtn + expandBtn;
+                        },
+                        orderable: false,
+                        searchable: false
+                    },
                     {
                         data: 'id',
                         render: function(id, type, row) {
@@ -180,6 +215,142 @@
                     }
                 ]
             });
+
+            $('#data-customer-audit-table tbody').on('click', '.btn-expand-data-audit', function() {
+                const tr = $(this).closest('tr');
+                const row = dataCustomerAuditTable.row(tr);
+                const id = $(this).data('id');
+
+                if (row.child.isShown()) {
+                    // Sembunyikan child row
+                    row.child.hide();
+                    tr.removeClass('shown');
+                } else {
+                    const url = window.ROUTES.dataAuditList.replace(':id', id);
+
+                    $.get(url, function(data) {
+                        // Container untuk subtable
+                        let html = `<table class="table table-bordered table-striped mt-3" id="subtable-${id}" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Temuan</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>PIC</th>
+                                    <th>Keterangan</th>
+                                    <th>File Evident</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                        </table>`;
+
+                        row.child(html).show();
+                        tr.addClass('shown');
+
+                        // Inisialisasi DataTable untuk child row
+                        $(`#subtable-${id}`).DataTable({
+                            data: data.data, // <-- perhatikan ini
+                            columns: [{
+                                    data: 'temuan'
+                                },
+                                {
+                                    data: 'due_date',
+                                    defaultContent: '-'
+                                },
+                                {
+                                    data: 'status',
+                                    render: function(status, type, row) {
+                                        const isClosed = row.file_evident ? true :
+                                            status.toLowerCase() === 'closed';
+                                        const badgeClass = isClosed ? 'bg-success' :
+                                            'bg-warning';
+                                        return `<span class="badge ${badgeClass}">${isClosed ? 'Closed' : 'Open'}</span>`;
+                                    }
+                                },
+                                {
+                                    data: 'pic'
+                                },
+                                {
+                                    data: 'keterangan',
+                                    defaultContent: '-'
+                                },
+                                {
+                                    data: 'file_evident',
+                                    render: function(file) {
+                                        if (file) {
+                                            const fileUrl =
+                                                `${window.DATA_AUDIT_BASE_URL}/${file}`;
+                                            return `<button class="btn btn-sm btn-info btn-preview-pdf" data-file="${fileUrl}">
+                <i class="ti ti-file"></i> Lihat
+            </button>`;
+                                        }
+                                        return '-';
+                                    }
+                                },
+                                {
+                                    data: 'id',
+                                    orderable: false,
+                                    searchable: false,
+                                    render: function(rowData) {
+                                        return `
+                                        <button class="btn btn-sm btn-warning btn-edit-data-audit" data-id="${rowData}">
+                                            <i class="ti ti-pencil"></i> Edit
+                                        </button>
+                                        <button class="btn btn-sm btn-danger btn-delete-data-audit" data-id="${rowData}">
+                                            <i class="ti ti-trash"></i> Delete
+                                        </button>
+                                        `;
+                                    }
+                                }
+                            ],
+                            paging: false,
+                            searching: false,
+                            info: false,
+                            ordering: false
+                        });
+
+                    });
+                }
+            });
+
+            // Delete child DataAudit
+            $(document).on('click', '.btn-delete-data-audit', function() {
+                const id = $(this).data('id');
+
+                Swal.fire({
+                    title: 'Yakin ingin menghapus data audit?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('customer-audit.destroy-audit-data', ':id') }}"
+                                .replace(':id', id),
+                            type: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                Swal.fire('Berhasil!', response.message, 'success');
+
+                                // Reload parent table (opsional) atau reload child table saja
+                                // Jika ingin reload child table:
+                                // Temukan parent row dan reload DataTable-nya
+                                $('#subtable-' + id).DataTable().ajax.reload(null,
+                                    false); // false = pertahankan paging
+                                dataCustomerAuditTable.ajax.reload(null,
+                                    false); // reload parent table
+                            },
+                            error: function(xhr) {
+                                Swal.fire('Gagal!', 'Terjadi kesalahan.', 'error');
+                            }
+                        });
+                    }
+                });
+            });
+
 
             // Delete data
             $(document).on('click', '.btn-delete', function() {
@@ -213,4 +384,15 @@
             });
         });
     </script>
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '{{ session('success') }}',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        </script>
+    @endif
 @endpush

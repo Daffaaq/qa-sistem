@@ -45,6 +45,13 @@
                         <small class="form-text text-muted">Kosongkan jika tidak ingin mengganti file.</small>
                     </div>
 
+                    <div class="mb-3">
+                        <label for="edit_keterangan" class="form-label">Keterangan</label>
+                        <textarea name="keterangan" id="edit_keterangan" class="form-control" rows="3"></textarea>
+                        <div class="invalid-feedback" id="error-edit-keterangan"></div>
+                        <small class="form-text text-muted">Opsional. Update catatan jika diperlukan.</small>
+                    </div>
+
                     <!-- Preview File Saat Ini -->
                     <div class="mb-3" id="current-file-info" style="display: none;">
                         <label class="form-label">Preview File Saat Ini:</label>
@@ -76,13 +83,15 @@
     </div>
 </div>
 @push('scripts')
-    <script>
+    <script type="module">
         window.BASE_URL = "{{ asset('documents/manual-mutu') }}"; // Path file PDF
         window.manualMutuEditRoute = "{{ route('manual-mutu.edit', ':id') }}";
         window.manualMutuUpdateRoute = "{{ route('manual-mutu.update', ':id') }}";
 
         // pdf.js worker
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        import * as pdfjsLib from '{{ route('pdf.module', ['file' => 'pdf']) }}';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '{{ route('pdf.worker', ['file' => 'pdf']) }}';
+
 
         let pdfDocEditManual = null;
         let currentPageEditManual = 1;
@@ -143,7 +152,7 @@
                 console.error("Error loading PDF:", error);
                 $('#pdf-loading-message-edit').html(
                     `<p class="text-danger">Gagal memuat PDF. <a href="${fileUrl}" target="_blank">Download</a>.</p>`
-                    ).show();
+                ).show();
                 $('#pdf-canvas-edit-manual').hide();
                 $('#pdf-controls-edit').hide();
             });
@@ -167,6 +176,8 @@
                 $('#edit_document_id').val(data.id);
                 $('#edit_title_document').val(data.title_document);
                 $('#edit_category_document').val(data.category_document || 'Manual Mutu');
+                // Di dalam $.get(editUrl, ...)
+                $('#edit_keterangan').val(data.keterangan || '');
 
                 if (data.file_document) {
                     loadPDFEditManual(`${window.BASE_URL}/${data.file_document}`);

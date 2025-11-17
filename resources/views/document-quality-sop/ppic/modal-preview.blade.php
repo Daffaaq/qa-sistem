@@ -22,128 +22,117 @@
     </div>
 </div>
 @push('scripts')
-    <script>
+    <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
-            window.BASE_URL = "{{ asset('documents/ppic') }}";
-            // Set lokasi worker PDF.js supaya tidak error deprecated warning
-            pdfjsLib.GlobalWorkerOptions.workerSrc =
-                'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+            const pdfModuleUrl = "{{ route('pdf.module', ['file' => 'pdf']) }}";
+            const pdfWorkerUrl = "{{ route('pdf.worker', ['file' => 'pdf']) }}";
 
-            const modalPDF = document.getElementById('modalPreviewPDF');
-            const canvas = document.getElementById('pdfCanvas');
-            const ctx = canvas.getContext('2d');
+            import(pdfModuleUrl).then(pdfjsLib => {
+                window.BASE_URL = "{{ asset('documents/ppic') }}";
+                pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
-            const prevPageBtn = document.getElementById('prevPage');
-            const nextPageBtn = document.getElementById('nextPage');
-            const pageNumText = document.getElementById('pageNum');
-            const pageCountText = document.getElementById('pageCount');
-            const zoomInBtn = document.getElementById('zoomIn');
-            const zoomOutBtn = document.getElementById('zoomOut');
-            const zoomLevelText = document.getElementById('zoomLevel');
+                const modalPDF = document.getElementById('modalPreviewPDF');
+                const canvas = document.getElementById('pdfCanvas');
+                const ctx = canvas.getContext('2d');
 
-            let pdfDoc = null;
-            let currentPage = 1;
-            let scale = 1.0;
-            const scaleStep = 0.25;
-            const minScale = 0.75;
-            const maxScale = 3.0;
+                const prevPageBtn = document.getElementById('prevPage');
+                const nextPageBtn = document.getElementById('nextPage');
+                const pageNumText = document.getElementById('pageNum');
+                const pageCountText = document.getElementById('pageCount');
+                const zoomInBtn = document.getElementById('zoomIn');
+                const zoomOutBtn = document.getElementById('zoomOut');
+                const zoomLevelText = document.getElementById('zoomLevel');
 
-            // Render halaman tertentu
-            function renderPage(num) {
-                pdfDoc.getPage(num).then(page => {
-                    // Dapatkan ukuran modal untuk scale fitting lebar modal
-                    const modalDialog = modalPDF.querySelector('.modal-dialog');
-                    const maxWidth = modalDialog.clientWidth || window.innerWidth * 0.9;
+                let pdfDoc = null;
+                let currentPage = 1;
+                let scale = 1.0;
+                const scaleStep = 0.25;
+                const minScale = 0.75;
+                const maxScale = 3.0;
 
-                    // Hitung viewport default scale=1
-                    const viewport = page.getViewport({
-                        scale: 1
+                function renderPage(num) {
+                    pdfDoc.getPage(num).then(page => {
+                        const modalDialog = modalPDF.querySelector('.modal-dialog');
+                        const maxWidth = modalDialog.clientWidth || window.innerWidth * 0.9;
+
+                        const viewport = page.getViewport({
+                            scale: 1
+                        });
+                        const fitScale = maxWidth / viewport.width;
+                        const adjustedScale = scale * fitScale;
+
+                        const scaledViewport = page.getViewport({
+                            scale: adjustedScale
+                        });
+                        canvas.width = scaledViewport.width;
+                        canvas.height = scaledViewport.height;
+                        canvas.style.width = `${scaledViewport.width}px`;
+                        canvas.style.height = `${scaledViewport.height}px`;
+
+                        const renderContext = {
+                            canvasContext: ctx,
+                            viewport: scaledViewport
+                        };
+                        page.render(renderContext);
+
+                        pageNumText.textContent = num;
+                        pageCountText.textContent = pdfDoc.numPages;
+                        zoomLevelText.textContent = Math.round(scale * 100) + '%';
+                        prevPageBtn.disabled = num <= 1;
+                        nextPageBtn.disabled = num >= pdfDoc.numPages;
                     });
-                    // Hitung scale agar lebar canvas sesuai lebar modal
-                    const fitScale = maxWidth / viewport.width;
+                }
 
-                    // Gabungkan scale zoom user dengan fitScale
-                    const adjustedScale = scale * fitScale;
+                modalPDF.addEventListener('show.bs.modal', event => {
+                    const button = event.relatedTarget;
+                    const title = button.getAttribute('data-title') || 'Pratinjau Dokumen';
+                    const urlPath = button.getAttribute('data-url');
+                    const url = `${window.BASE_URL}${urlPath}`;
 
-                    const scaledViewport = page.getViewport({
-                        scale: adjustedScale
+                    modalPDF.querySelector('.modal-title').textContent = title;
+                    scale = 1.0;
+                    currentPage = 1;
+
+                    pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
+                        pdfDoc = pdfDoc_;
+                        pageCountText.textContent = pdfDoc.numPages;
+                        renderPage(currentPage);
+                    }).catch(err => {
+                        alert('Gagal memuat dokumen PDF: ' + err.message);
+                        bootstrap.Modal.getInstance(modalPDF).hide();
                     });
-
-                    // Set ukuran canvas dengan ukuran pixel viewport
-                    canvas.width = scaledViewport.width;
-                    canvas.height = scaledViewport.height;
-                    canvas.style.width = `${scaledViewport.width}px`;
-                    canvas.style.height = `${scaledViewport.height}px`;
-
-                    // Render page ke canvas
-                    const renderContext = {
-                        canvasContext: ctx,
-                        viewport: scaledViewport,
-                    };
-                    page.render(renderContext);
-
-                    // Update UI
-                    pageNumText.textContent = num;
-                    pageCountText.textContent = pdfDoc.numPages;
-                    zoomLevelText.textContent = Math.round(scale * 100) + '%';
-                    prevPageBtn.disabled = num <= 1;
-                    nextPageBtn.disabled = num >= pdfDoc.numPages;
                 });
-            }
 
-            // Event buka modal -> load PDF
-            modalPDF.addEventListener('show.bs.modal', event => {
-                const button = event.relatedTarget;
-                const title = button.getAttribute('data-title') || 'Pratinjau Dokumen';
-                const urlPath = button.getAttribute('data-url'); // Ambil path relatif dari data-url
-                const url = `${window.BASE_URL}${urlPath}`; // Gabungkan dengan window.BASE_URL
-                console.log(url);
-                modalPDF.querySelector('.modal-title').textContent = title;
+                modalPDF.addEventListener('hidden.bs.modal', () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    pdfDoc = null;
+                });
 
-                scale = 1.0;
-                currentPage = 1;
-
-                pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
-                    pdfDoc = pdfDoc_;
-                    pageCountText.textContent = pdfDoc.numPages;
+                prevPageBtn.addEventListener('click', () => {
+                    if (currentPage <= 1) return;
+                    currentPage--;
                     renderPage(currentPage);
-                }).catch(err => {
-                    alert('Gagal memuat dokumen PDF: ' + err.message);
-                    bootstrap.Modal.getInstance(modalPDF).hide();
                 });
-            });
 
-            // Clear canvas saat modal ditutup
-            modalPDF.addEventListener('hidden.bs.modal', () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                pdfDoc = null;
-            });
+                nextPageBtn.addEventListener('click', () => {
+                    if (currentPage >= pdfDoc.numPages) return;
+                    currentPage++;
+                    renderPage(currentPage);
+                });
 
-            // Navigasi halaman
-            prevPageBtn.addEventListener('click', () => {
-                if (currentPage <= 1) return;
-                currentPage--;
-                renderPage(currentPage);
-            });
+                zoomInBtn.addEventListener('click', () => {
+                    if (!pdfDoc) return;
+                    scale = Math.min(scale + scaleStep, maxScale);
+                    renderPage(currentPage);
+                });
 
-            nextPageBtn.addEventListener('click', () => {
-                if (currentPage >= pdfDoc.numPages) return;
-                currentPage++;
-                renderPage(currentPage);
-            });
+                zoomOutBtn.addEventListener('click', () => {
+                    if (!pdfDoc) return;
+                    scale = Math.max(scale - scaleStep, minScale);
+                    renderPage(currentPage);
+                });
 
-            // Zoom in/out
-            zoomInBtn.addEventListener('click', () => {
-                if (!pdfDoc) return;
-                scale = Math.min(scale + scaleStep, maxScale);
-                renderPage(currentPage);
-            });
-
-            zoomOutBtn.addEventListener('click', () => {
-                if (!pdfDoc) return;
-                scale = Math.max(scale - scaleStep, minScale);
-                renderPage(currentPage);
-            });
+            }).catch(err => console.error("Failed to load pdf module:", err));
         });
     </script>
 @endpush

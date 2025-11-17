@@ -61,13 +61,13 @@
 
 @push('scripts')
     <!-- Include PDF.js CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
-    <script>
+    <script type="module">
+        import * as pdfjsLib from '{{ route('pdf.module', ['file' => 'pdf']) }}';
         window.BASE_URL = "{{ asset('documents/customer-audit') }}"; // Path to files
         window.customerAuditShowRoute = "{{ route('customer-audit.show', ':id') }}";
 
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '{{ route('pdf.worker', ['file' => 'pdf']) }}';
 
         let pdfDocViewCustomerAudit = null;
         let currentPageViewCustomerAudit = 1;

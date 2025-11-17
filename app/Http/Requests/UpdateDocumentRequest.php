@@ -26,6 +26,7 @@ class UpdateDocumentRequest extends FormRequest
         return [
             'title_document' => 'required|string|max:255',
             'file_document' => 'nullable|file|mimetypes:application/pdf|max:102400', // max 2MB
+            'keterangan' => 'nullable|string',
         ];
     }
 
@@ -45,6 +46,8 @@ class UpdateDocumentRequest extends FormRequest
             'file_document.file' => 'File dokumen harus berupa file.',
             'file_document.mimetypes' => 'Format file dokumen harus PDF.',
             'file_document.max' => 'Ukuran file dokumen tidak boleh lebih dari 100MB.',
+
+            'keterangan.string' => 'Keterangan harus berupa teks.',
         ];
     }
 }

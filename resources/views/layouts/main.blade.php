@@ -3270,8 +3270,7 @@
     <script src="{{ asset('modernize/libs/apexcharts/dist/apexcharts.min.js') }}"></script>
     <script src="{{ asset('modernize/js/dashboard.js') }}"></script>
     <script src="{{ asset('modernize/libs/dragula/dist/dragula.min.js') }}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfobject/2.2.6/pdfobject.min.js"></script>
+
 
 
 

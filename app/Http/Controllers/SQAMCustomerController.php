@@ -91,6 +91,7 @@ class SQAMCustomerController extends Controller
         DocumentHistorie::create([
             'document_id' => $document->id,
             'title_document' => $request->title_document,
+            'keterangan' => $request->keterangan ?? null,
             'file_document' => $filename,
             'date_document' => now()->toDateString(),
             'time_document' => now()->toTimeString(),
@@ -134,6 +135,7 @@ class SQAMCustomerController extends Controller
         return response()->json([
             'id' => $document->id,
             'title_document' => $history->title_document ?? '',
+            'keterangan' => $history->keterangan ?? '',
             'file_document' => $history->file_document ?? '',
             'category_document' => $document->category_document,
         ]);
@@ -166,6 +168,7 @@ class SQAMCustomerController extends Controller
 
         $history->update([
             'title_document' => $request->title_document,
+            'keterangan' => $request->keterangan ?? null,
             'file_document' => $filename,
             'date_document' => now()->format('Y-m-d'),
             'time_document' => now()->format('H:i:s'),
@@ -214,6 +217,7 @@ class SQAMCustomerController extends Controller
             'file_document' => $history->file_document ?? '',
             'date_document' => $history->date_document ?? '',
             'time_document' => $history->time_document ?? '',
+            'keterangan' => $history->keterangan ?? '',
         ]);
     }
 
@@ -243,9 +247,14 @@ class SQAMCustomerController extends Controller
             ->orderByDesc('revision_number')
             ->value('title_document');
 
+        $prevKeterangan = DocumentHistorie::where('document_id', $id)
+            ->orderByDesc('revision_number')
+            ->value('keterangan');
+
         DocumentHistorie::create([
             'document_id' => $document->id,
             'title_document' => $prevTitle,
+            'keterangan' => $prevKeterangan,
             'file_document' => $filename,
             'date_document' => now()->format('Y-m-d'),
             'time_document' => now()->format('H:i:s'),
@@ -279,12 +288,15 @@ class SQAMCustomerController extends Controller
             }
 
             $documents[$docId]['revisions'][] = [
+                'id' => $history->id,
                 'revision_number' => $history->revision_number,
                 'title_document' => $history->title_document,
                 'file_document' => $history->file_document,
                 'date_document' => $history->date_document,
                 'time_document' => $history->time_document,
+                'keterangan' => $history->keterangan,
                 'is_active' => $history->is_active,
+
             ];
 
             if ($history->is_active) {
@@ -300,6 +312,29 @@ class SQAMCustomerController extends Controller
 
         return response()->json([
             'documents' => $documents,
+        ]);
+    }
+
+    public function setActiveRevision(Request $request, $historyId)
+    {
+        $request->validate([
+            'history_id' => 'required|exists:document_histories,id'
+        ]);
+
+        $newActive = DocumentHistorie::findOrFail($historyId);
+
+        DB::transaction(function () use ($newActive) {
+            DocumentHistorie::where('document_id', $newActive->document_id)
+                ->where('id', '!=', $newActive->id)
+                ->update(['is_active' => false]);
+
+            $newActive->update(['is_active' => true]);
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Revisi berhasil diaktifkan',
+            'active_revision' => $newActive->revision_number
         ]);
     }
 }

@@ -24,7 +24,7 @@ class LoginController extends Controller
 
         if (Auth::attempt($request->only('email', 'password'))) {
             $request->session()->regenerate();
-            return back()->with('loginSuccess', 'Login berhasil!');
+            return redirect()->route('dashboard')->with('loginSuccess', 'Login berhasil!');
         }
 
         return back()->with('loginFailed', 'Email atau password salah.')->withInput();

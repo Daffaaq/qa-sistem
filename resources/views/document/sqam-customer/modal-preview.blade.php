@@ -25,136 +25,119 @@
 </div>
 
 @push('scripts')
-    <script>
-        $(document).ready(function() {
-            pdfjsLib.GlobalWorkerOptions.workerSrc =
-                'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    <script type="module">
+        // === DI LUAR $(document).ready() → WAJIB! ===
+        const PDF_MODULE_URL = "{{ route('pdf.module', ['file' => 'pdf']) }}";
+        const PDF_WORKER_URL = "{{ route('pdf.worker', ['file' => 'pdf']) }}";
 
-            let pdfDoc = null; // Global variable for the PDF document
-            let currentPage = 1; // Initialize current page
-            let scale = 1.0; // Initialize scale (zoom)
-            const scaleStep = 0.25; // Step size for zooming
-            const maxScale = 3.0;
-            const minScale = 0.75;
+        // Dynamic import di top-level
+        import(PDF_MODULE_URL).then(pdfjsLib => {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = PDF_WORKER_URL;
 
-            // Function to load the PDF and initialize canvas
-            function loadPDF(fileUrl) {
-                const loadingTask = pdfjsLib.getDocument(fileUrl);
-                loadingTask.promise.then(function(pdf) {
-                    pdfDoc = pdf;
-                    renderPage(currentPage); // Render the first page
-                }).catch(function(error) {
-                    console.error("Error loading PDF:", error);
-                    $('#pdfLoadingSpinner').hide();
-                });
-            }
+            // === SEKARANG BARU GUNAKAN jQuery ===
+            $(function() {
+                let pdfDoc = null;
+                let currentPage = 1;
+                let scale = 1.0;
+                const scaleStep = 0.25;
+                const maxScale = 3.0;
+                const minScale = 0.75;
 
-            // Function to render PDF page
-            function renderPage(pageNum) {
-                const canvas = document.getElementById('pdf-canvas');
-                if (!canvas) {
-                    console.error("Canvas element not found.");
-                    return;
-                }
+                function renderPage(pageNum) {
+                    const canvas = document.getElementById('pdf-canvas');
+                    if (!canvas || !pdfDoc) return;
 
-                const ctx = canvas.getContext('2d');
-                if (!ctx) {
-                    console.error("Canvas context not found.");
-                    return;
-                }
+                    const ctx = canvas.getContext('2d');
+                    if (!ctx) return;
 
-                pdfDoc.getPage(pageNum).then(function(page) {
-                    const viewport = page.getViewport({
-                        scale: scale
+                    pdfDoc.getPage(pageNum).then(page => {
+                        const viewport = page.getViewport({
+                            scale: scale
+                        });
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
+
+                        const renderContext = {
+                            canvasContext: ctx,
+                            viewport: viewport
+                        };
+                        page.render(renderContext).promise.then(() => {
+                            $('#pageNum').text(currentPage);
+                            $('#pageCount').text(pdfDoc.numPages);
+                            $('#zoomLevel').text(Math.round(scale * 100) + '%');
+                            $('#prevPage').prop('disabled', currentPage <= 1);
+                            $('#nextPage').prop('disabled', currentPage >= pdfDoc.numPages);
+                        });
                     });
-                    canvas.width = viewport.width;
-                    canvas.height = viewport.height;
+                }
 
-                    const renderContext = {
-                        canvasContext: ctx,
-                        viewport: viewport
-                    };
+                // Buka modal & load PDF
+                $(document).on('click', '.btn-preview-pdf', function() {
+                    const fileUrl = $(this).data('file');
+                    const modal = new bootstrap.Modal(document.getElementById('pdfPreviewModal'));
 
-                    page.render(renderContext).promise.then(function() {
-                        // Hide spinner and display canvas
-                        $('#pdfLoadingSpinner').hide();
-                        $('#pdf-container').show();
+                    $('#pdf-container').hide();
+                    $('#pdfLoadingSpinner')?.show();
 
-                        // Update page number UI
-                        $('#pageNum').text(currentPage);
-                        $('#pageCount').text(pdfDoc.numPages);
+                    pdfjsLib.getDocument(fileUrl).promise.then(pdf => {
+                        pdfDoc = pdf;
+                        currentPage = 1;
+                        scale = 1.0;
+                        renderPage(currentPage);
+                        modal.show();
+                    }).catch(err => {
+                        console.error('PDF Load Error:', err);
+                        alert('Gagal memuat PDF: ' + err.message);
                     });
                 });
+
+                // Navigasi & Zoom
+                $('#prevPage').on('click', () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderPage(currentPage);
+                    }
+                });
+                $('#nextPage').on('click', () => {
+                    if (currentPage < pdfDoc?.numPages) {
+                        currentPage++;
+                        renderPage(currentPage);
+                    }
+                });
+                $('#zoomIn').on('click', () => {
+                    scale = Math.min(scale + scaleStep, maxScale);
+                    renderPage(currentPage);
+                });
+                $('#zoomOut').on('click', () => {
+                    scale = Math.max(scale - scaleStep, minScale);
+                    renderPage(currentPage);
+                });
+
+                // Bersihkan saat modal ditutup
+                $('#pdfPreviewModal').on('hidden.bs.modal', () => {
+                    $('#pdf-container').html(
+                        '<canvas id="pdf-canvas" style="border:1px solid #ccc; max-width: 100%;"></canvas>'
+                    );
+                    pdfDoc = null;
+                    currentPage = 1;
+                    scale = 1.0;
+                    $('#pageNum').text('1');
+                    $('#pageCount').text('1');
+                    $('#zoomLevel').text('100%');
+                });
+            });
+        }).catch(err => {
+            console.error("Failed to load PDF.js module:", err);
+            alert("Gagal memuat PDF.js. Pastikan route 'pdf.module' mengembalikan file .mjs dengan benar.");
+        });
+
+        // Reset and load PDF after modal opens (example: after a revision)
+        $('#modalRevisiSQAMSupplier').on('hidden.bs.modal', function() {
+            const fileUrl = $('#revisi-sqam-supplier-file-embed').attr(
+                'src'); // Get updated file URL (from embed)
+            if (fileUrl) {
+                loadPDF(fileUrl); // Load the new PDF file
             }
-
-            // Trigger to open PDF preview
-            $(document).on('click', '.btn-preview-pdf', function() {
-                const fileUrl = $(this).data('file'); // Get file URL
-                const modal = new bootstrap.Modal(document.getElementById(
-                    'pdfPreviewModal')); // Modal for preview
-
-                // Show spinner & hide canvas
-                $('#pdfLoadingSpinner').show();
-                $('#pdf-container').hide();
-
-                // Load the PDF and show modal
-                loadPDF(fileUrl);
-                modal.show();
-            });
-
-            // Navigasi halaman PDF
-            $('#prevPage').on('click', function() {
-                if (currentPage > 1) {
-                    currentPage--;
-                    renderPage(currentPage);
-                }
-            });
-
-            $('#nextPage').on('click', function() {
-                if (currentPage < pdfDoc.numPages) {
-                    currentPage++;
-                    renderPage(currentPage);
-                }
-            });
-
-            // Zoom in/out
-            $('#zoomIn').on('click', function() {
-                if (!pdfDoc) return;
-                scale = Math.min(scale + scaleStep, maxScale);
-                renderPage(currentPage);
-            });
-
-            $('#zoomOut').on('click', function() {
-                if (!pdfDoc) return;
-                scale = Math.max(scale - scaleStep, minScale);
-                renderPage(currentPage);
-            });
-
-            // Clear canvas when modal is closed
-            // Clear canvas when modal is closed
-            $('#pdfPreviewModal').on('hidden.bs.modal', function() {
-                // Reset canvas by replacing the content of the container
-                $('#pdf-container').html(
-                    '<canvas id="pdf-canvas" style="border:1px solid #ccc; max-width: 100%;"></canvas>'
-                );
-
-                // Reset the page and scale
-                currentPage = 1;
-                scale = 1.0;
-                // Also reset UI elements if needed (though they'll be updated on next load)
-                $('#pageNum').text('1');
-                $('#pageCount').text('1');
-                $('#zoomLevel').text('100%');
-            });
-
-            // Reset and load PDF after modal opens (example: after a revision)
-            $('#modalRevisiSQAMSupplier').on('hidden.bs.modal', function() {
-                const fileUrl = $('#revisi-sqam-supplier-file-embed').attr(
-                    'src'); // Get updated file URL (from embed)
-                if (fileUrl) {
-                    loadPDF(fileUrl); // Load the new PDF file
-                }
-            });
         });
     </script>
 @endpush

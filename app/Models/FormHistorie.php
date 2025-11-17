@@ -18,7 +18,8 @@ class FormHistorie extends Model
         'date_document',
         'time_document',
         'revision_number',
-        'is_active'
+        'is_active',
+        'keterangan',
     ];
 
     public function form()

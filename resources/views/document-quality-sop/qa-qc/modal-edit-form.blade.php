@@ -33,6 +33,14 @@
                         <small class="form-text text-muted">Kosongkan jika tidak ingin mengganti file.</small>
                     </div>
 
+                    <div class="mb-3">
+                        <label for="edit_form_keterangan" class="form-label">Keterangan</label>
+                        <textarea name="keterangan" id="edit_form_keterangan" class="form-control" rows="3"
+                            placeholder="Contoh: Dokumen SOP QA QC untuk pengujian material tahun 2025"></textarea>
+                        <div class="invalid-feedback" id="error-edit-keterangan"></div>
+                        <small class="form-text text-muted">Jelaskan tujuan atau perubahan dokumen.</small>
+                    </div>
+
                     <!-- Canvas for PDF Preview -->
                     <div class="mb-3" id="current-form-file-info" style="display: none;">
                         <label class="form-label">Preview File Saat Ini:</label>
@@ -64,11 +72,12 @@
     </div>
 </div>
 @push('scripts')
-    <script>
+    <script type="module">
+        import * as pdfjsLib from '{{ route('pdf.module', ['file' => 'pdf']) }}';
         window.BASE_URL = "{{ asset('documents') }}"; // Set base URL dynamically
 
         // Load pdf.js worker
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '{{ route("pdf.worker", ["file" => "pdf"]) }}';
 
         let pdfDocEditForm = null;
         let currentPageEditForm = 1;
@@ -162,6 +171,7 @@
             $.get("{{ route('qa-qc.edit-form', ':formId') }}".replace(':formId', formId), function(data) {
                 $('#edit_form_id').val(formId);
                 $('#edit_form_title_document').val(data.title_document);
+                $('#edit_form_keterangan').val(data.keterangan);
 
                 if (data.file_document) {
                     const fileUrl = `${window.BASE_URL}/${data.file_document}`;

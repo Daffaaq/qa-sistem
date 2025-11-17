@@ -2,8 +2,7 @@
 <div class="modal fade" id="modalCreateSOPRep" tabindex="-1" aria-labelledby="modalCreateSOPRepLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form action="{{ route('she.store-sop') }}" method="POST" enctype="multipart/form-data"
-                id="formCreateSOPRep">
+            <form action="{{ route('she.store-sop') }}" method="POST" enctype="multipart/form-data" id="formCreateSOPRep">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalCreateSOPRepLabel">Tambah Dokumen SOP SHE
@@ -32,6 +31,14 @@
                         <small class="form-text text-muted">
                             Kategori ini ditentukan otomatis dan tidak bisa diubah.
                         </small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit_keterangan" class="form-label">Keterangan</label>
+                        <textarea name="keterangan" id="edit_keterangan" class="form-control" rows="3"
+                            placeholder="Contoh: Dokumen SOP Irga untuk pengujian material tahun 2025"></textarea>
+                        <div class="invalid-feedback" id="error-edit-keterangan"></div>
+                        <small class="form-text text-muted">Jelaskan tujuan atau perubahan dokumen.</small>
                     </div>
 
                     <div class="mb-3">

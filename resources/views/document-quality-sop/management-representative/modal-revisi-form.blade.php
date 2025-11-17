@@ -39,6 +39,14 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="revise_keterangan_form_display" class="form-label">Keterangan</label>
+                        <textarea name="keterangan" id="revise_keterangan_form_display" class="form-control" rows="3" readonly
+                            placeholder="Contoh: Dokumen SOP QA QC untuk pengujian material tahun 2025"></textarea>
+                        <div class="invalid-feedback" id="error-edit-keterangan"></div>
+                        <small class="form-text text-muted">Jelaskan tujuan atau perubahan dokumen.</small>
+                    </div>
+
+                    <div class="mb-3">
                         <label class="form-label">Dokumen Form Aktif Saat Ini</label>
                         <div id="pdf-preview-Revisi-form"
                             style="border: 1px solid #ccc; max-height: 500px; overflow: auto; text-align: center;">
@@ -81,15 +89,18 @@
             const formId = $(this).data('form-id');
 
             // Use the route helper for dynamic URL
-            const actionUrl = "{{ route('management-representative.revise-form', ':formId') }}".replace(':formId', formId);
+            const actionUrl = "{{ route('management-representative.revise-form', ':formId') }}".replace(':formId',
+                formId);
             $('#formReviseForm').attr('action', actionUrl);
 
             $('#modalReviseForm').modal('show').on('shown.bs.modal', function() {
                 // Fetch data for the form document and preview
-                $.get("{{ route('management-representative.revisi-form', ':formId') }}".replace(':formId', formId),
+                $.get("{{ route('management-representative.revisi-form', ':formId') }}".replace(':formId',
+                        formId),
                     function(data) {
                         $('#revise_form_id').val(formId);
                         $('#title_document_form_rev').val(data.title_document || 'No Title');
+                        $('#revise_keterangan_form_display').val(data.keterangan || '');
 
                         if (data.file_document) {
                             const fileUrl = `${window.BASE_URL}/${data.file_document}`;

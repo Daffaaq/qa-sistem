@@ -43,6 +43,14 @@
                         <div class="invalid-feedback" id="error-file_document"></div>
                     </div>
 
+                    <div class="mb-3">
+                        <label for="revisi_keterangan" class="form-label">Keterangan Revisi </label>
+                        <textarea name="keterangan" id="revisi_keterangan" class="form-control" rows="3" readonly
+                            placeholder="Wajib diisi. Contoh: Penyesuaian SOP sesuai audit internal"></textarea>
+                        <div class="invalid-feedback" id="error-keterangan"></div>
+                        <small class="form-text text-muted">Jelaskan alasan revisi ini.</small>
+                    </div>
+
                     <!-- File Preview using Canvas -->
                     <div class="mb-3" id="revisi-file-preview" style="display: none;">
                         <label class="form-label">File Sebelumnya:</label>
@@ -71,9 +79,10 @@
     </div>
 </div>
 @push('scripts')
-    <script>
+    <script type="module">
         window.BASE_URL = "{{ asset('documents/manual-mutu') }}";
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        import * as pdfjsLib from '{{ route('pdf.module', ['file' => 'pdf']) }}';
+            pdfjsLib.GlobalWorkerOptions.workerSrc = '{{ route('pdf.worker', ['file' => 'pdf']) }}';
 
         let pdfDocRevisiManualMutu = null;
         let currentPageRevisiManualMutu = 1;
@@ -130,7 +139,7 @@
                 console.error("Error loading PDF:", err);
                 $('#pdf-loading-message-revisi').html(
                     `<p class="text-danger">Gagal memuat PDF. <a href="${fileUrl}" target="_blank">Download untuk cek</a></p>`
-                    ).show();
+                ).show();
                 $('#pdf-canvas-revisi-manual').hide();
                 $('#pdf-controls-revisi').hide();
             });
@@ -146,9 +155,10 @@
                 $('#revisi_document_id').val(data.id);
                 $('#revisi_title_document').val(data.title_document);
                 $('#revisi_category_document').val(data.category_document);
+                $('#revisi_keterangan').val(data.keterangan || '');
 
                 currentPdfRevisiUrl = data.file_document ? `${window.BASE_URL}/${data.file_document}` :
-                null;
+                    null;
                 $('#formRevisiManualMutu').attr('action', `{{ route('manual-mutu.storeRevisi', ':id') }}`
                     .replace(':id', data.id));
                 $('#modalRevisiManualMutu').modal('show');

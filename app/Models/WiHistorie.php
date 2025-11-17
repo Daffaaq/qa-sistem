@@ -19,6 +19,7 @@ class WiHistorie extends Model
         'time_document',
         'revision_number',
         'is_active',
+        'keterangan',
     ];
 
     public function wi()

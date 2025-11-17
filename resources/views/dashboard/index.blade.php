@@ -432,6 +432,15 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            @if (session('loginSuccess'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: '{{ session('loginSuccess') }}',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+            @endif
             // Fungsi animasi counter
             function animateCounter(counter) {
                 const target = +counter.getAttribute("data-count");

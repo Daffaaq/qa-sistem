@@ -19,6 +19,7 @@ class DocumentHistorie extends Model
         'time_document',
         'revision_number',
         'is_active',
+        'keterangan',
     ];
 
     protected $casts = [

@@ -101,6 +101,7 @@ class DocumentManualMutuController extends Controller
                 DocumentHistorie::create([
                     'document_id' => $document->id,
                     'title_document' => $request->title_document,
+                    'keterangan' => $request->keterangan ?? null,
                     'file_document' => $filename,
                     'date_document' => now()->toDateString(),
                     'time_document' => now()->toTimeString(),
@@ -159,6 +160,7 @@ class DocumentManualMutuController extends Controller
             'title_document' => $history->title_document ?? '',
             'file_document' => $history->file_document ?? '',
             'category_document' => $document->category_document,
+            'keterangan' => $history->keterangan ?? '',
         ]);
     }
 
@@ -195,6 +197,7 @@ class DocumentManualMutuController extends Controller
                 $history->update([
                     'title_document' => $request->title_document,
                     'file_document' => $newFilename,
+                    'keterangan' => $request->keterangan ?? null,
                     'date_document' => now()->toDateString(),
                     'time_document' => now()->toTimeString(),
                 ]);
@@ -284,6 +287,7 @@ class DocumentManualMutuController extends Controller
             'file_document' => $history->file_document ?? '',
             'date_document' => $history->date_document ?? '',
             'time_document' => $history->time_document ?? '',
+            'keterangan' => $history->keterangan ?? '',
         ]);
     }
 
@@ -314,11 +318,15 @@ class DocumentManualMutuController extends Controller
         $prevTitle = DocumentHistorie::where('document_id', $id)
             ->orderByDesc('revision_number')
             ->value('title_document');
-
+        // ambil keterangan dari revisi sebelumnya
+        $prevKeterangan = DocumentHistorie::where('document_id', $id)
+            ->orderByDesc('revision_number')
+            ->value('keterangan');
         // Simpan revisi baru
         DocumentHistorie::create([
             'document_id' => $document->id,
             'title_document' => $prevTitle,
+            'keterangan' => $prevKeterangan,
             'file_document' => $filename,
             'date_document' => now()->format('Y-m-d'),
             'time_document' => now()->format('H:i:s'),
@@ -354,11 +362,13 @@ class DocumentManualMutuController extends Controller
 
             // Simpan revisi
             $documents[$docId]['revisions'][] = [
+                'id' => $history->id,
                 'revision_number' => $history->revision_number,
                 'title_document' => $history->title_document,
                 'file_document' => $history->file_document,
                 'date_document' => $history->date_document,
                 'time_document' => $history->time_document,
+                'keterangan' => $history->keterangan,
                 'is_active' => $history->is_active,
             ];
 
@@ -377,6 +387,31 @@ class DocumentManualMutuController extends Controller
 
         return response()->json([
             'documents' => $documents,
+        ]);
+    }
+
+    public function setActiveRevision(Request $request, $historyId)
+    {
+        $request->validate([
+            'history_id' => 'required|exists:document_histories,id'
+        ]);
+
+        $newActive = DocumentHistorie::findOrFail($historyId);
+
+        DB::transaction(function () use ($newActive) {
+            // Nonaktifkan semua revisi dari dokumen yang sama
+            DocumentHistorie::where('document_id', $newActive->document_id)
+                ->where('id', '!=', $newActive->id)
+                ->update(['is_active' => false]);
+
+            // Aktifkan yang dipilih
+            $newActive->update(['is_active' => true]);
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Revisi berhasil diaktifkan',
+            'active_revision' => $newActive->revision_number
         ]);
     }
 }

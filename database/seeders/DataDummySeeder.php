@@ -15,62 +15,74 @@ class DataDummySeeder extends Seeder
      */
     public function run()
     {
-        $data = [
-            ['bulan' => 2, 'total_kirim' => 68000000, 'tahun' => 2025],
-            ['bulan' => 6, 'total_kirim' => 97000000, 'tahun' => 2025],
-            ['bulan' => 10, 'total_kirim' => 63180000, 'tahun' => 2025],
-            ['bulan' => 4, 'total_kirim' => 590000000, 'tahun' => 2025],
-            ['bulan' => 5, 'total_kirim' => 19200000, 'tahun' => 2025],
-            ['bulan' => 1, 'total_kirim' => 3360000, 'tahun' => 2025],
-            ['bulan' => 8, 'total_kirim' => 19200000, 'tahun' => 2025],
-            ['bulan' => 12, 'total_kirim' => 2400000, 'tahun' => 2025],
-            ['bulan' => 11, 'total_kirim' => 22320000, 'tahun' => 2025],
-            ['bulan' => 3, 'total_kirim' => 720000, 'tahun' => 2025],
-            ['bulan' => 7, 'total_kirim' => 18600000, 'tahun' => 2025],
-            ['bulan' => 9, 'total_kirim' => 1800000, 'tahun' => 2025],
-            ['bulan' => 1, 'total_kirim' => 4800000, 'tahun' => 2025],
-            ['bulan' => 6, 'total_kirim' => 1800000, 'tahun' => 2025],
-            ['bulan' => 5, 'total_kirim' => 2400000, 'tahun' => 2025],
-            ['bulan' => 8, 'total_kirim' => 2400000, 'tahun' => 2025],
-            ['bulan' => 4, 'total_kirim' => 2400000, 'tahun' => 2025],
-            ['bulan' => 2, 'total_kirim' => 330000, 'tahun' => 2025],
-            ['bulan' => 7, 'total_kirim' => 2400000, 'tahun' => 2025],
-            ['bulan' => 10, 'total_kirim' => 2400000, 'tahun' => 2025],
-            ['bulan' => 9, 'total_kirim' => 1080000, 'tahun' => 2025],
-            ['bulan' => 3, 'total_kirim' => 1680000, 'tahun' => 2025],
-            ['bulan' => 4, 'total_kirim' => 13440000, 'tahun' => 2025],
-            ['bulan' => 11, 'total_kirim' => 1370000, 'tahun' => 2025],
-            ['bulan' => 3, 'total_kirim' => 200000, 'tahun' => 2025],
-            ['bulan' => 12, 'total_kirim' => 100000, 'tahun' => 2025],
-            ['bulan' => 5, 'total_kirim' => 20000, 'tahun' => 2025],
-            ['bulan' => 7, 'total_kirim' => 300000, 'tahun' => 2025],
-            ['bulan' => 8, 'total_kirim' => 20000, 'tahun' => 2025],
-            ['bulan' => 10, 'total_kirim' => 20000, 'tahun' => 2025],
-            ['bulan' => 9, 'total_kirim' => 3676090000, 'tahun' => 2025],
-            ['bulan' => 1, 'total_kirim' => 4000000, 'tahun' => 2025],
-            ['bulan' => 11, 'total_kirim' => 20000000, 'tahun' => 2025],
-            ['bulan' => 3, 'total_kirim' => 36400000, 'tahun' => 2025],
-            ['bulan' => 6, 'total_kirim' => 400000, 'tahun' => 2025],
-            ['bulan' => 5, 'total_kirim' => 129400000, 'tahun' => 2025],
-            ['bulan' => 2, 'total_kirim' => 10000, 'tahun' => 2025],
-            ['bulan' => 7, 'total_kirim' => 86020000, 'tahun' => 2025],
-            ['bulan' => 12, 'total_kirim' => 200000, 'tahun' => 2025],
-            ['bulan' => 10, 'total_kirim' => 180000, 'tahun' => 2025],
-            ['bulan' => 3, 'total_kirim' => 80000, 'tahun' => 2025],
-            ['bulan' => 8, 'total_kirim' => 79500000, 'tahun' => 2025],
-            ['bulan' => 5, 'total_kirim' => 46400000, 'tahun' => 2025],
-            ['bulan' => 9, 'total_kirim' => 4800000, 'tahun' => 2025],
-            ['bulan' => 4, 'total_kirim' => 25200000, 'tahun' => 2025],
-            ['bulan' => 1, 'total_kirim' => 153600000, 'tahun' => 2025],
-            ['bulan' => 2, 'total_kirim' => 26400000, 'tahun' => 2025],
-            ['bulan' => 3, 'total_kirim' => 3600000, 'tahun' => 2025],
-            ['bulan' => 6, 'total_kirim' => 3600000, 'tahun' => 2025],
-            ['bulan' => 5, 'total_kirim' => 54600000, 'tahun' => 2025],
-            ['bulan' => 12, 'total_kirim' => 1800000, 'tahun' => 2025]
+        // Daftar customer
+        $customers = [
+            [
+                'kodecustomer' => 'CL00056',
+                'customer' => 'PT. YAMAHA INDONESIA MOTOR MFG',
+                'tsidiid' => 'TSI123',
+                'tipartname' => 'Part A',
+                'tipartnumber' => 'PA123'
+            ],
+            [
+                'kodecustomer' => 'CL00063',
+                'customer' => 'PT MITSUBISHI KRAMA YUDHA TIGA BERLIANMOTORS',
+                'tsidiid' => 'TSI124',
+                'tipartname' => 'Part B',
+                'tipartnumber' => 'PA124'
+            ],
+            [
+                'kodecustomer' => 'CL00064',
+                'customer' => 'PT ASAHI DENSO INDONESIA',
+                'tsidiid' => 'TSI129',
+                'tipartname' => 'Part C',
+                'tipartnumber' => 'PA129'
+            ]
         ];
 
-        foreach ($data as $datum) {
-            DataDummy::create($datum);
+        // Fungsi untuk generate total_kirim acak per customer per bulan
+        $generateTotalKirim = function ($baseMin, $baseMax, $bulan, $tahun) {
+            // Variasi berdasarkan bulan dan tahun (bisa disesuaikan)
+            $multiplier = ($tahun == 2025) ? 1.05 : 1.00; // 2025 naik 5%
+            $seasonal = [1 => 1.1, 2 => 1.2, 4 => 1.5, 12 => 0.8]; // Contoh musiman
+            $factor = $seasonal[$bulan] ?? 1.0;
+
+            $base = rand($baseMin, $baseMax);
+            return (int) ($base * $factor * $multiplier);
+        };
+
+        // Rentang base per customer (bisa disesuaikan)
+        $baseRanges = [
+            'CL00056' => [5000000, 80000000],  // Yamaha: sedang - tinggi
+            'CL00063' => [60000000, 120000000], // Mitsubishi: tinggi
+            'CL00064' => [1000000, 30000000],   // Asahi: rendah - sedang
+        ];
+
+        // Proses untuk tahun 2024 dan 2025
+        foreach ([2024, 2025] as $tahun) {
+            foreach ($customers as $customer) {
+                $kode = $customer['kodecustomer'];
+                [$min, $max] = $baseRanges[$kode] ?? [1000000, 50000000]; // default
+
+                for ($bulan = 1; $bulan <= 12; $bulan++) {
+                    $total_kirim = $generateTotalKirim($min, $max, $bulan, $tahun);
+
+                    $datum = [
+                        'bulan' => $bulan,
+                        'ngnonofficial' => rand(1, 50),
+                        'ngofficial' => rand(1, 50),
+                        'total_kirim' => $total_kirim,
+                        'tahun' => $tahun,
+                        'kodecustomer' => $kode,
+                        'customer' => $customer['customer'],
+                        'tsidiid' => $customer['tsidiid'],
+                        'tipartname' => $customer['tipartname'],
+                        'tipartnumber' => $customer['tipartnumber']
+                    ];
+
+                    DataDummy::create($datum);
+                }
+            }
         }
     }
 }

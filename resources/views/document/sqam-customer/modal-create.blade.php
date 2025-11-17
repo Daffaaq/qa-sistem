@@ -46,6 +46,17 @@
                         </small>
                     </div>
 
+                    <div class="mb-3">
+                        <label for="keterangan_modal" class="form-label">Keterangan Dokumen <span
+                                class="text-danger">*</span></label>
+                        <textarea name="keterangan" id="keterangan_modal" class="form-control" rows="3"
+                            placeholder="Wajib diisi. Contoh: Dokumen SQAM untuk customer PT ABC tahun 2025"></textarea>
+                        <div class="invalid-feedback" id="error-keterangan"></div>
+                        <small class="form-text text-muted">
+                            Jelaskan tujuan atau isi dokumen ini.
+                        </small>
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>

@@ -38,6 +38,14 @@
                         <small class="form-text text-muted">Hanya format PDF. Ukuran maksimal 100MB.</small>
                     </div>
 
+                    <div class="mb-3">
+                        <label for="revise_keterangan_display" class="form-label">Keterangan</label>
+                        <textarea name="keterangan" id="revise_keterangan_display" class="form-control" rows="3" readonly
+                            placeholder="Contoh: Dokumen SOP Maintanance untuk pengujian material tahun 2025"></textarea>
+                        <div class="invalid-feedback" id="error-edit-keterangan"></div>
+                        <small class="form-text text-muted">Jelaskan tujuan atau perubahan dokumen.</small>
+                    </div>
+
                     <div class="mb-3" id="current-file-info-revisi" style="display: none;">
                         <label class="form-label">Preview File Saat Ini:</label>
                         <div id="pdf-preview-revisi-sop"
@@ -86,6 +94,7 @@
             // Ambil data judul & file aktif dari server
             $.get("{{ route('maintanance.revisi-sop', ':id') }}".replace(':id', sopId), function(data) {
                 $('#title_document_revise').val(data.title_document || '');
+                $('#revise_keterangan_display').val(data.keterangan || '');
 
                 // Tampilkan PDF preview jika ada file
                 if (data.file_document) {

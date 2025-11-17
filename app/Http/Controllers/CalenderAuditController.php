@@ -56,6 +56,7 @@ class CalenderAuditController extends Controller
             // Tambahkan background highlight untuk semua event
             $events[] = [
                 'id' => $audit->id . '_bg', // unik untuk background supaya tidak bentrok
+                'title' => '',
                 'start' => $startDate->format('Y-m-d'),
                 'end' => $endDate ? $endDate->format('Y-m-d') : null,
                 'display' => 'background',

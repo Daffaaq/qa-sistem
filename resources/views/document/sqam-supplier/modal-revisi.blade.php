@@ -47,6 +47,17 @@
                         <div class="invalid-feedback" id="error-file_document"></div>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="form-label">Keterangan Revisi Saat Ini</label>
+                        <div id="revisi_keterangan_display" class="form-control bg-light text-dark"
+                            style="min-height: 80px; padding: 10px; white-space: pre-wrap; font-size: 0.95rem; line-height: 1.5; border: 1px solid #dee2e6; border-radius: 0.375rem;">
+                            —
+                        </div>
+                        <small class="form-text text-muted mt-1">
+                            Keterangan ini hanya untuk referensi. Tidak dapat diubah saat revisi.
+                        </small>
+                    </div>
+
                     <!-- File Preview for previous document -->
                     <div class="mb-3" id="revisi-sqam-supplier-file-preview" style="display: none;">
                         <label class="form-label">File Sebelumnya:</label>
@@ -81,9 +92,10 @@
 </div>
 
 @push('scripts')
-    <script>
+    <script type="module">
         window.BASE_URL = "{{ asset('documents/sqam-supplier') }}";
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        import * as pdfjsLib from '{{ route('pdf.module', ['file' => 'pdf']) }}';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '{{ route('pdf.worker', ['file' => 'pdf']) }}';
 
         let pdfDocRevisiSQAM = null;
         let currentPageRevisiSQAM = 1;
@@ -164,6 +176,7 @@
                 $('#revisi_sqam_supplier_document_id').val(data.id);
                 $('#revisi_sqam_supplier_title_document').val(data.title_document);
                 $('#revisi_sqam_supplier_category_document').val(data.category_document);
+                $('#revisi_keterangan_display').text(data.keterangan || '—');
 
                 // If there is a file document, display it in the canvas viewer
                 if (data.file_document) {

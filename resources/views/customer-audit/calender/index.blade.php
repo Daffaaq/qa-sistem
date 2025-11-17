@@ -199,20 +199,38 @@
             background-color: #f8f9fa;
         }
 
-        /* Menghapus garis border pada event di kalender */
-        .fc-event {
+        /* === HAPUS GARIS BAWAH & BORDER EVENT === */
+        .fc .fc-event {
             border: none !important;
-            /* Pastikan tidak ada border */
             box-shadow: none !important;
-            /* Pastikan tidak ada bayangan */
+            /* Biar tidak ada background default */
         }
 
-        /* Menghapus garis horizontal yang muncul di bawah event */
-        .fc-event-main {
+        .fc-event-title-container {
+            background-color: none !important;
+        }
+
+        .fc .fc-event-main {
             border: none !important;
-            /* Hilangkan garis bawah event */
-            background-color: inherit !important;
-            /* Pastikan tidak ada warna border */
+            background: transparent !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* Pastikan title tetap muncul tanpa gangguan */
+        .fc .fc-event-title {
+            padding: 2px 4px !important;
+            font-weight: bold !important;
+            color: #000 !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Optional: Tambah (Selesai) untuk event lewat */
+        .fc-event.past-event .fc-event-title {
+            opacity: 0.7;
+            font-style: italic;
         }
     </style>
 @endpush
@@ -234,7 +252,7 @@
                 headerToolbar: {
                     start: 'prev,next today',
                     center: 'title',
-                    end: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    end: 'dayGridMonth'
                 },
                 selectable: true,
                 events: @json($events),
@@ -269,33 +287,6 @@
                     $('#modalCreateCustomerAuditCalender').modal('show');
                 },
 
-                // Custom rendering
-                eventContent: function(arg) {
-                    // Jangan tampilkan title kalau event display = background
-                    if (arg.event.display === 'background') return;
-
-                    let wrapper = document.createElement('div');
-
-                    // Tampilkan title hanya untuk event sudah lewat
-                    if (arg.event.extendedProps.pastEvent) {
-                        wrapper.style.position = 'absolute';
-                        wrapper.style.top = '0';
-                        wrapper.style.left = '0';
-                        wrapper.style.width = '100%';
-                        wrapper.style.height = '100%';
-                        wrapper.style.display = 'flex';
-                        wrapper.style.alignItems = 'center';
-                        wrapper.style.justifyContent = 'center';
-                        wrapper.style.fontWeight = 'bold';
-                        wrapper.style.color = '#000';
-                        wrapper.style.pointerEvents = 'none';
-                        wrapper.innerText = arg.event.title;
-                    }
-
-                    return {
-                        domNodes: [wrapper]
-                    };
-                },
 
                 eventTimeFormat: {
                     hour: '2-digit',

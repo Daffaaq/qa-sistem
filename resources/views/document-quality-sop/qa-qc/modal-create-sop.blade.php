@@ -33,6 +33,15 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="keterangan_document_sop" class="form-label">Deskripsi Dokumen
+                        </label>
+                        <textarea name="keterangan" id="keterangan_document_sop" class="form-control" rows="3"></textarea>
+                        <small class="form-text text-muted">
+                            Jelaskan tujuan atau isi dokumen ini.
+                        </small>
+                    </div>
+                    
+                    <div class="mb-3">
                         <label for="file_document_sop" class="form-label">Upload Dokumen (PDF)
                             <span class="text-danger">*</span>
                         </label>

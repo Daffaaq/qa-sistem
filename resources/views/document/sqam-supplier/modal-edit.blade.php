@@ -46,6 +46,17 @@
                         <small class="form-text text-muted">Kosongkan jika tidak ingin mengganti file.</small>
                     </div>
 
+                    <div class="mb-3">
+                        <label for="edit_keterangan" class="form-label">Keterangan Dokumen <span
+                                class="text-danger">*</span></label>
+                        <textarea name="keterangan" id="edit_keterangan" class="form-control" rows="3"
+                            placeholder="Wajib diisi. Contoh: Dokumen SQAM untuk customer PT ABC tahun 2025"></textarea>
+                        <div class="invalid-feedback" id="error-keterangan"></div>
+                        <small class="form-text text-muted">
+                            Jelaskan tujuan atau isi dokumen ini.
+                        </small>
+                    </div>
+
                     <div class="mb-3" id="current-file-info-sqam" style="display: none;">
                         <label class="form-label">Preview File Saat Ini:</label>
                         <div id="pdf-preview-edit-sqam"
@@ -76,10 +87,11 @@
 </div>
 
 @push('scripts')
-    <script>
+    <script type="module">
         window.BASE_URL = "{{ asset('documents/sqam-supplier') }}"; // Dynamically set BASE_URL
 
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        import * as pdfjsLib from '{{ route('pdf.module', ['file' => 'pdf']) }}';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '{{ route('pdf.worker', ['file' => 'pdf']) }}';
 
         let pdfDocEditSQAM = null;
         let currentPageEditSQAM = 1;
@@ -177,7 +189,8 @@
                         $('#edit_sqam_supplier_id').val(data.id);
                         $('#edit_title_document_sqam').val(data.title_document);
                         $('#edit_category_document_sqam').val(data.category_document ||
-                        'SQAM Supplier');
+                            'SQAM Supplier');
+                        $('#edit_keterangan').val(data.keterangan || '');
 
                         if (data.file_document) {
                             const fileUrl = `${window.BASE_URL}/${data.file_document}`;
@@ -258,7 +271,7 @@
 
                             $.each(errors, function(field, messages) {
                                 let input = $(
-                                `#formEditSQAMSupplier [name="${field}"]`);
+                                    `#formEditSQAMSupplier [name="${field}"]`);
                                 input.addClass('is-invalid');
                                 $(`#error-${field}`).text(messages[0]);
                             });

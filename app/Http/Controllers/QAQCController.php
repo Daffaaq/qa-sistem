@@ -14,6 +14,7 @@ use App\Models\SopHistorie;
 use App\Models\Wi;
 use App\Models\WiHistorie;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class QAQCController extends Controller
@@ -155,6 +156,7 @@ class QAQCController extends Controller
             'sop_id' => $sop->id,
             'title_document' => $request->title_document,
             'file_document' => $path,
+            'keterangan' => $request->keterangan ?? null,
             'date_document' => now()->toDateString(),
             'time_document' => now()->toTimeString(),
             'revision_number' => 0,
@@ -182,6 +184,7 @@ class QAQCController extends Controller
             'id' => $sop->id,
             'title_document' => $history->title_document,
             'file_document' => $history->file_document,
+            'keterangan' => $history->keterangan
         ]);
     }
 
@@ -218,6 +221,7 @@ class QAQCController extends Controller
 
         // Update data lainnya
         $activeHistory->title_document = $request->title_document;
+        $activeHistory->keterangan = $request->keterangan ?? null;
         $activeHistory->date_document = now()->toDateString();
         $activeHistory->time_document = now()->toTimeString();
 
@@ -296,7 +300,8 @@ class QAQCController extends Controller
             'title_document' => $history->title_document,
             'file_document' => $history->file_document,
             'date_document' => $history->date_document,
-            'time_document' => $history->time_document
+            'time_document' => $history->time_document,
+            'keterangan' => $history->keterangan
         ]);
     }
 
@@ -314,6 +319,7 @@ class QAQCController extends Controller
 
 
         $previousTitle = $currentActive->title_document;
+        $previousKeterangan = $currentActive->keterangan;
 
         // Hitung revisi terakhir
         $lastRevisionNumber = $sop->histories()->max('revision_number');
@@ -331,6 +337,7 @@ class QAQCController extends Controller
         $newHistory = $sop->histories()->create([
             'title_document' => $previousTitle,
             'file_document' => $path,
+            'keterangan' => $previousKeterangan,
             'date_document' => now()->toDateString(),
             'time_document' => now()->toTimeString(),
             'revision_number' => $lastRevisionNumber + 1,
@@ -341,6 +348,19 @@ class QAQCController extends Controller
             'success' => true,
             'message' => 'Revisi SOP berhasil ditambahkan.',
         ]);
+    }
+
+    public function setActiveSop($historyId, Request $request)
+    {
+        $request->validate(['history_id' => 'required|exists:sop_histories,id']);
+        $newActive = SopHistorie::findOrFail($historyId);
+
+        DB::transaction(function () use ($newActive) {
+            SopHistorie::where('sop_id', $newActive->sop_id)->update(['is_active' => false]);
+            $newActive->update(['is_active' => true]);
+        });
+
+        return response()->json(['success' => true, 'message' => "Revisi {$newActive->revision_number} diaktifkan."]);
     }
 
 
@@ -367,6 +387,7 @@ class QAQCController extends Controller
             'wi_id' => $wi->id,
             'title_document' => $request->title_document,
             'file_document' => $path,
+            'keterangan' => $request->keterangan ?? null,
             'date_document' => now()->toDateString(),
             'time_document' => now()->toTimeString(),
             'revision_number' => 0,
@@ -395,6 +416,7 @@ class QAQCController extends Controller
             'id' => $wi->id,
             'title_document' => $history->title_document,
             'file_document' => $history->file_document,
+            'keterangan' => $history->keterangan ?? '',
         ]);
     }
 
@@ -428,6 +450,7 @@ class QAQCController extends Controller
 
         // Update data lainnya
         $activeHistory->title_document = $request->title_document;
+        $activeHistory->keterangan = $request->keterangan ?? null;
         $activeHistory->date_document = now()->toDateString();
         $activeHistory->time_document = now()->toTimeString();
         $activeHistory->save();
@@ -486,7 +509,8 @@ class QAQCController extends Controller
             'title_document' => $history->title_document,
             'file_document' => $history->file_document,
             'date_document' => $history->date_document,
-            'time_document' => $history->time_document
+            'time_document' => $history->time_document,
+            'keterangan' => $history->keterangan ?? '',
         ]);
     }
 
@@ -520,6 +544,7 @@ class QAQCController extends Controller
         $wi->histories()->create([
             'title_document' => $currentActive->title_document, // pakai judul sebelumnya
             'file_document' => $path,
+            'keterangan' => $request->keterangan ?? null,
             'date_document' => now()->toDateString(),
             'time_document' => now()->toTimeString(),
             'revision_number' => $lastRevisionNumber + 1,
@@ -530,6 +555,19 @@ class QAQCController extends Controller
             'success' => true,
             'message' => 'Revisi WI berhasil ditambahkan.',
         ]);
+    }
+
+    public function setActiveWi($historyId, Request $request)
+    {
+        $request->validate(['history_id' => 'required|exists:wi_histories,id']);
+        $newActive = WiHistorie::findOrFail($historyId);
+
+        DB::transaction(function () use ($newActive) {
+            WiHistorie::where('wi_id', $newActive->wi_id)->update(['is_active' => false]);
+            $newActive->update(['is_active' => true]);
+        });
+
+        return response()->json(['success' => true, 'message' => "Revisi WI {$newActive->revision_number} diaktifkan."]);
     }
 
     public function storeForm(StoreDocumentRequest $request, $id)
@@ -554,6 +592,7 @@ class QAQCController extends Controller
         FormHistorie::create([
             'form_id' => $form->id,
             'title_document' => $request->title_document,
+            'keterangan' => $request->keterangan ?? null,
             'file_document' => $path,
             'date_document' => now()->toDateString(),
             'time_document' => now()->toTimeString(),
@@ -583,6 +622,7 @@ class QAQCController extends Controller
             'id' => $form->id,
             'title_document' => $history->title_document,
             'file_document' => $history->file_document,
+            'keterangan' => $history->keterangan ?? '',
         ]);
     }
 
@@ -616,6 +656,7 @@ class QAQCController extends Controller
 
         // Update data lainnya
         $activeHistory->title_document = $request->title_document;
+        $activeHistory->keterangan = $request->keterangan ?? null;
         $activeHistory->date_document = now()->toDateString();
         $activeHistory->time_document = now()->toTimeString();
 
@@ -663,7 +704,8 @@ class QAQCController extends Controller
             'title_document' => $history->title_document,
             'file_document' => $history->file_document,
             'date_document' => $history->date_document,
-            'time_document' => $history->time_document
+            'time_document' => $history->time_document,
+            'keterangan' => $history->keterangan ?? '',
         ]);
     }
 
@@ -696,6 +738,7 @@ class QAQCController extends Controller
         // Simpan histori baru
         $form->histories()->create([
             'title_document' => $currentActive->title_document, // Tetap pakai judul sebelumnya
+            'keterangan' => $currentActive->keterangan ?? null,
             'file_document' => $path,
             'date_document' => now()->toDateString(),
             'time_document' => now()->toTimeString(),
@@ -707,6 +750,19 @@ class QAQCController extends Controller
             'success' => true,
             'message' => 'Revisi Form berhasil ditambahkan.',
         ]);
+    }
+
+    public function setActiveForm($historyId, Request $request)
+    {
+        $request->validate(['history_id' => 'required|exists:form_histories,id']);
+        $newActive = FormHistorie::findOrFail($historyId);
+
+        DB::transaction(function () use ($newActive) {
+            FormHistorie::where('form_id', $newActive->form_id)->update(['is_active' => false]);
+            $newActive->update(['is_active' => true]);
+        });
+
+        return response()->json(['success' => true, 'message' => "Revisi Form {$newActive->revision_number} diaktifkan."]);
     }
 
 
@@ -730,56 +786,70 @@ class QAQCController extends Controller
             ->get();
 
         $data = $sops->map(function ($sop) {
+            // === SOP ===
+            $sopActiveRev = $sop->histories->firstWhere('is_active', 1)?->revision_number ?? null;
+
             return [
                 'type' => 'sop',
                 'sop_id' => $sop->id,
-                'title' => optional($sop->histories->last())->title_document,
-                'revisions' => $sop->histories->map(function ($rev) {
-                    return [
-                        'revision_number' => $rev->revision_number,
-                        'title_document' => $rev->title_document,
-                        'file_document' => $rev->file_document ? asset('documents/qa-qc/' . ltrim($rev->file_document, '/')) : null,  // Perbaikan: menggunakan 'documents/' dan menghapus '/' dari awal file_path
-                        'date_document' => $rev->date_document,
-                        'time_document' => $rev->time_document,
-                        'is_active' => $rev->is_active,
-                    ];
-                }),
+                'title' => $sop->histories->last()?->title_document ?? 'Tanpa Judul SOP', // dari last()
+                'active_revision' => $sopActiveRev, // dari is_active = 1
+                'revisions' => $sop->histories->map(fn($h) => [
+                    'id' => $h->id,
+                    'revision_number' => $h->revision_number,
+                    'title_document' => $h->title_document ?? '',
+                    'keterangan' => $h->keterangan ?? '',
+                    'file_document' => $h->file_document ? asset('documents/qa-qc/' . ltrim($h->file_document, '/')) : null,
+                    'date_document' => $h->date_document ?? '',
+                    'time_document' => $h->time_document ?? '',
+                    'is_active' => (int) $h->is_active,
+                ])->values(),
+
+                // === WI ===
                 'wis' => $sop->wis->map(function ($wi) {
+                    $wiActiveRev = $wi->histories->firstWhere('is_active', 1)?->revision_number ?? null;
+                    // dd($wiActiveRev);
                     return [
                         'type' => 'wi',
                         'wi_id' => $wi->id,
-                        'title' => optional($wi->histories->last())->title_document,
-                        'revisions' => $wi->histories->map(function ($rev) {
-                            return [
-                                'revision_number' => $rev->revision_number,
-                                'title_document' => $rev->title_document,
-                                'file_document' => $rev->file_document ? asset('documents/qa-qc/' . ltrim($rev->file_document, '/')) : null,  // Perbaikan
-                                'date_document' => $rev->date_document,
-                                'time_document' => $rev->time_document,
-                                'is_active' => $rev->is_active,
-                            ];
-                        }),
+                        'title' => $wi->histories->last()?->title_document ?? 'Tanpa Judul WI', // dari last()
+                        'active_revision' => $wiActiveRev, // dari is_active = 1
+                        'revisions' => $wi->histories->map(fn($h) => [
+                            'id' => $h->id,
+                            'revision_number' => $h->revision_number,
+                            'title_document' => $h->title_document ?? '',
+                            'keterangan' => $h->keterangan ?? '',
+                            'file_document' => $h->file_document ? asset('documents/qa-qc/' . ltrim($h->file_document, '/')) : null,
+                            'date_document' => $h->date_document ?? '',
+                            'time_document' => $h->time_document ?? '',
+                            'is_active' => (int) $h->is_active,
+                        ])->values(),
+
+                        // === FORM ===
                         'forms' => $wi->forms->map(function ($form) {
+                            $formActiveRev = $form->histories->firstWhere('is_active', 1)?->revision_number ?? null;
+
                             return [
                                 'type' => 'form',
                                 'form_id' => $form->id,
-                                'title' => optional($form->histories->last())->title_document,
-                                'revisions' => $form->histories->map(function ($rev) {
-                                    return [
-                                        'revision_number' => $rev->revision_number,
-                                        'title_document' => $rev->title_document,
-                                        'file_document' => $rev->file_document ? asset('documents/qa-qc/' . ltrim($rev->file_document, '/')) : null,  // Perbaikan
-                                        'date_document' => $rev->date_document,
-                                        'time_document' => $rev->time_document,
-                                        'is_active' => $rev->is_active,
-                                    ];
-                                }),
+                                'title' => $form->histories->last()?->title_document ?? 'Tanpa Judul Form',
+                                'active_revision' => $formActiveRev,
+                                'revisions' => $form->histories->map(fn($h) => [
+                                    'id' => $h->id,
+                                    'revision_number' => $h->revision_number,
+                                    'title_document' => $h->title_document ?? '',
+                                    'keterangan' => $h->keterangan ?? '',
+                                    'file_document' => $h->file_document ? asset('documents/qa-qc/' . ltrim($h->file_document, '/')) : null,
+                                    'date_document' => $h->date_document ?? '',
+                                    'time_document' => $h->time_document ?? '',
+                                    'is_active' => (int) $h->is_active,
+                                ])->values(),
                             ];
-                        }),
+                        })->values(),
                     ];
-                }),
+                })->values(),
             ];
-        });
+        })->values();
 
         return response()->json([
             'success' => true,

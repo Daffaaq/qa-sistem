@@ -43,6 +43,14 @@
                         <div class="invalid-feedback" id="error-file_document"></div>
                         <small class="form-text text-muted">Hanya format PDF. Ukuran maksimal 100MB.</small>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="keterangan_modal" class="form-label">Keterangan Dokumen <span
+                                class="text-danger">*</span></label>
+                        <textarea name="keterangan" id="keterangan_modal" class="form-control" rows="3"
+                            placeholder="Contoh: Dokumen SQAM untuk supplier PT XYZ tahun 2025"></textarea>
+                        <div class="invalid-feedback" id="error-keterangan"></div>
+                    </div>
                 </div>
 
                 <div class="modal-footer">

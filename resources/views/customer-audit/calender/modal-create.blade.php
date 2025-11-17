@@ -42,7 +42,7 @@
                         <div class="col-md-12">
                             <label for="deskripsi_event" class="form-label">Deskripsi Event <span
                                     class="text-danger">*</span></label>
-                            <textarea name="deskripsi_event" id="deskripsi_event" class="form-control" rows="3" required></textarea>
+                            <textarea name="deskripsi_event" id="deskripsi_event" class="form-control" rows="5" required></textarea>
                             <div class="invalid-feedback" id="error-deskripsi_event"></div>
                         </div>
 
@@ -66,29 +66,8 @@
     </div>
 </div>
 
-@push('styles')
-    <!-- Include Summernote CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
-@endpush
-
 @push('scripts')
-    <!-- Include Summernote JS -->
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
-
     <script>
-        // Initialize Summernote for Deskripsi Event
-        $(document).ready(function() {
-            $('#deskripsi_event').summernote({
-                height: 200, // set the height of the editor
-                placeholder: 'Tuliskan deskripsi event di sini...',
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['color', ['color']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                ]
-            });
-        });
-
         // Form Submit with AJAX
         $('#formCreateCustomerAudit').on('submit', function(e) {
             e.preventDefault();
@@ -122,19 +101,15 @@
                         });
                         form[0].reset();
                         $('#modalCreateCustomerAuditCalender').modal('hide');
-                        // Reload data table or perform any necessary UI update
 
-                        // 🔹 Refresh data upcoming events & calendar tanpa reload
+                        // Refresh upcoming events & calendar
                         $.ajax({
                             url: "{{ route('customer-audit.refresh') }}",
                             type: "GET",
                             success: function(res) {
-                                // Update upcoming events section
                                 $('#upcomingEventsContainer').html(res.upcomingHtml);
-
-                                // Update calendar events
-                                calendar.removeAllEvents(); // hapus event lama
-                                calendar.addEventSource(res.events); // tambahkan event baru
+                                calendar.removeAllEvents();
+                                calendar.addEventSource(res.events);
                                 calendar.refetchEvents();
                                 calendar.updateSize();
                             }
@@ -173,7 +148,6 @@
             form[0].reset();
             form.find('.form-control, .form-select').removeClass('is-invalid');
             form.find('.invalid-feedback').text('');
-            $('#deskripsi_event').summernote('reset'); // Reset the Summernote editor
         });
     </script>
 @endpush

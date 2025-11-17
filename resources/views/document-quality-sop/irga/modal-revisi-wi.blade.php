@@ -37,6 +37,15 @@
                         <div class="invalid-feedback" id="error-file_document"></div>
                         <small class="form-text text-muted">Hanya format PDF. Ukuran maksimal 100MB.</small>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="revise_keterangan_wi_display" class="form-label">Keterangan</label>
+                        <textarea name="keterangan" id="revise_keterangan_wi_display" class="form-control" rows="3" readonly
+                            placeholder="Contoh: Dokumen SOP QA QC untuk pengujian material tahun 2025"></textarea>
+                        <div class="invalid-feedback" id="error-edit-keterangan"></div>
+                        <small class="form-text text-muted">Jelaskan tujuan atau perubahan dokumen.</small>
+                    </div>
+
                     <div class="mb-3" id="current-file-info-wi-revisi" style="display: none;">
                         <label class="form-label">Preview File Saat Ini:</label>
                         <div id="pdf-preview-Revisi-wi"
@@ -84,6 +93,7 @@
             // Ambil data judul & file aktif dari server
             $.get("{{ route('irga.revisi-wi', ':id') }}".replace(':id', wiId), function(data) {
                 $('#title_document_wi_rev').val(data.title_document || '');
+                $('#revise_keterangan_wi_display').val(data.keterangan || '');
 
                 // Tampilkan PDF preview jika ada file
                 if (data.file_document) {

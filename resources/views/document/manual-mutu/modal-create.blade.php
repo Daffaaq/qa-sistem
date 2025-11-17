@@ -37,6 +37,13 @@
                         <div class="invalid-feedback" id="error-file_document"></div>
                         <small class="form-text text-muted">Hanya format PDF. Ukuran maksimal 100MB.</small>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="keterangan_modal" class="form-label">Keterangan</label>
+                        <textarea name="keterangan" id="keterangan_modal" class="form-control" rows="3"
+                            placeholder="Contoh: Revisi sesuai peraturan terbaru Kemenkes 2025"></textarea>
+                        <small class="form-text text-muted">Opsional. Jelaskan perubahan atau catatan penting.</small>
+                    </div>
                 </div>
 
                 <div class="modal-footer">

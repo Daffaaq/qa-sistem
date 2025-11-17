@@ -23,6 +23,7 @@ return new class extends Migration
             $table->time('time_document');
             $table->integer('revision_number');
             $table->boolean('is_active');
+            $table->text('keterangan')->nullable();
             $table->timestamps();
         });
     }

@@ -16,11 +16,31 @@ class CustomerAuditController extends Controller
         $this->middleware('auth');
     }
 
+    public function dataAuditList($id)
+    {
+        $dataAudit = DB::table('data_audits')
+            ->where('customer_audits_id', $id)
+            ->select('id', 'temuan', 'due_date', 'status', 'pic', 'file_evident', 'keterangan');
+
+        return DataTables::of($dataAudit)
+            ->addIndexColumn()
+            ->make(true);
+    }
+
+
     public function list(Request $request)
     {
         if ($request->ajax()) {
             $data = DB::table('customer_audits')
-                ->select('id', 'nama_event', 'tanggal_mulai_event', 'tanggal_selesai_event', 'file_evident')->get();
+                ->select(
+                    'id',
+                    'nama_event',
+                    'tanggal_mulai_event',
+                    'tanggal_selesai_event',
+                    'file_evident',
+                    DB::raw('(SELECT COUNT(*) FROM data_audits WHERE data_audits.customer_audits_id = customer_audits.id) as has_audit')
+                )
+                ->get();
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->make(true);
@@ -212,24 +232,42 @@ class CustomerAuditController extends Controller
      */
     public function destroy($id)
     {
-        // mulai transaksi
         DB::beginTransaction();
         try {
             $customerAudit = CustomerAudit::findOrFail($id);
-            // Hapus file lama jika ada
+
+            // Hapus file customer audit
             if (!empty($customerAudit->file_evident)) {
                 $filePath = public_path('documents/customer-audit/' . $customerAudit->file_evident);
-
                 if (file_exists($filePath) && is_file($filePath)) {
                     unlink($filePath);
                 }
             }
+
+            // Hapus file-data audit terkait
+            foreach ($customerAudit->dataAudit as $dataAudit) {
+                if (!empty($dataAudit->file_evident)) {
+                    $filePath = public_path('documents/data-audit/' . $dataAudit->file_evident);
+                    if (file_exists($filePath) && is_file($filePath)) {
+                        unlink($filePath);
+                    }
+                }
+            }
+
+            // Hapus record parent, data audit otomatis ikut terhapus karena cascade
             $customerAudit->delete();
+
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Data customer audit deleted successfully']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Data customer audit dan file terkait berhasil dihapus'
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'An error occurred while deleting the data customer audit: ' . $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menghapus data: ' . $e->getMessage()
+            ]);
         }
     }
 }

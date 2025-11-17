@@ -67,26 +67,14 @@
 </div>
 
 @push('styles')
-    <!-- Include Summernote CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
 @endpush
 
 @push('scripts')
-    <!-- Include Summernote JS -->
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
 
     <script>
         // Initialize Summernote for Deskripsi Event
         $(document).ready(function() {
-            $('#deskripsi_event').summernote({
-                height: 200, // set the height of the editor
-                placeholder: 'Tuliskan deskripsi event di sini...',
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['color', ['color']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                ]
-            });
+            
         });
 
         // Form Submit with AJAX

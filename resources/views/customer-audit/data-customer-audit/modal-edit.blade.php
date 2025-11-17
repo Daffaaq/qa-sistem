@@ -91,14 +91,14 @@
 
 @push('scripts')
     <!-- Include PDF.js CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
-    <script>
+    <script type="module">
+        import * as pdfjsLib from '{{ route('pdf.module', ['file' => 'pdf']) }}';
         window.BASE_URL = "{{ asset('documents/customer-audit') }}"; // Path file
         window.customerAuditEditRoute = "{{ route('customer-audit.edit', ':id') }}";
         window.customerAuditUpdateRoute = "{{ route('customer-audit.update', ':id') }}";
 
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '{{ route('pdf.worker', ['file' => 'pdf']) }}';
 
         let pdfDocEditCustomerAudit = null;
         let currentPageEditCustomerAudit = 1;
@@ -195,15 +195,7 @@
 
                 $('#edit_tanggal_mulai_event').val(formattedStartDate);
                 $('#edit_tanggal_selesai_event').val(formattedEndDate);
-                $('#edit_deskripsi_event').summernote({
-                    toolbar: [
-                        ['style', ['bold', 'italic', 'underline', 'clear']],
-                        ['color', ['color']],
-                        ['para', ['ul', 'ol', 'paragraph']],
-                    ],
-                    height: 200, // Adjust the height of the editor as needed
-                });
-                $('#edit_deskripsi_event').summernote('code', data.deskripsi_event);
+                $('#edit_deskripsi_event').val(data.deskripsi_event); // langsung isi value
 
                 // Check if file_evident exists and is a valid PDF
                 if (data.file_evident) {

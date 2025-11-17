@@ -17,6 +17,50 @@
                 </div>
             </div>
         </div>
+        <section class="mt-4">
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="mb-4 fw-bold text-dark">Filter Customer</h5>
+                            <div class="form-group">
+                                <label for="customer">Select Customer</label>
+                                <select name="customer" id="customer" class="form-control form-control-sm">
+                                    <option value="">-- All Customers --</option>
+                                    @foreach ($dataCustomer as $customer)
+                                        <option value="{{ $customer->customer }}"
+                                            {{ request('customer') == $customer->customer ? 'selected' : '' }}>
+                                            {{ $customer->customer }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="mb-4 fw-bold text-dark">Filter Year</h5>
+                            <div class="form-group">
+                                <label for="tahun">Select Year</label>
+                                <select name="tahun" id="tahun" class="form-control form-control-sm">
+                                    <option value="">-- Default year --</option>
+                                    @foreach ($tahun as $t)
+                                        <option value="{{ $t->tahun }}"
+                                            {{ request('tahun') == $t->tahun ? 'selected' : '' }}>
+                                            {{ $t->tahun }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
 
         <section class="mt-4">
             <div class="card">
@@ -28,7 +72,7 @@
                                 class="bg-primary text-white rounded shadow-sm p-3 d-flex justify-content-between align-items-center">
                                 <div>
                                     <h4 class="mb-0 fw-bold" id="total-delivery">{{ $totalKirimSemuaFormatted }}</h4>
-                                    <small>Total Delivery {{ $year }}</small>
+                                    <small>Total Delivery <span id="delivery-year">{{ $year }}</span></small>
                                 </div>
                                 <i class="ti ti-truck fs-9"></i>
                             </div>
@@ -40,7 +84,7 @@
                                 class="bg-danger text-white rounded shadow-sm p-3 d-flex justify-content-between align-items-center">
                                 <div>
                                     <h4 class="mb-0 fw-bold" id="total-ng-items">{{ $totalQuantity }}</h4>
-                                    <small>Total NG Items {{ $year }}</small>
+                                    <small>Total NG Items <span id="ng-year">{{ $year }}</span></small>
                                 </div>
                                 <i class="ti ti-alert-circle fs-9"></i>
                             </div>
@@ -80,7 +124,7 @@
                 <div class="col-12 col-lg-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="mb-4 fw-bold text-dark">PPM Trend 2025</h5>
+                            <h5 class="mb-4 fw-bold text-dark" id="ppmTrendTitle">PPM Trend {{ date('Y') }}</h5>
                             <div id="ppmTrendChart"></div>
                         </div>
                     </div>
@@ -90,7 +134,8 @@
                 <div class="col-12 col-lg-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="mb-4 fw-bold text-dark">NG Distribution 2025</h5>
+                            <h5 class="mb-4 fw-bold text-dark" id="ngDistributionTitle">NG Distribution {{ date('Y') }}
+                            </h5>
                             <div id="ngDistributionChart"></div>
                         </div>
                     </div>
@@ -195,6 +240,10 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            // Ambil parameter customer dan tahun dari URL (query string)
+            var customerFilter = $('#customer').val();
+            var tahunFilter = $('#tahun').val();
+
             $('#dataTable').DataTable({
                 searching: false,
                 info: false,
@@ -213,7 +262,15 @@
                         $(row).removeClass('even').addClass('odd');
                     }
                 },
-                ajax: "{{ route('dashboard.data-claim.list') }}",
+                ajax: {
+                    url: "{{ route('dashboard.data-claim.list') }}",
+                    type: 'GET',
+                    data: function(d) {
+                        // Mengirimkan parameter customer dan tahun ke server
+                        d.customer = customerFilter;
+                        d.tahun = tahunFilter;
+                    }
+                },
                 columns: [{
                         data: 'bulan',
                         name: 'bulan'
@@ -252,17 +309,106 @@
                     [7, 'asc']
                 ] // Urutkan berdasarkan bulan
             });
+
+            // Update DataTable ketika dropdown berubah
+            $('#customer, #tahun').change(function() {
+                // Ambil parameter customer dan tahun terbaru
+                customerFilter = $('#customer').val();
+                tahunFilter = $('#tahun').val();
+
+                // Hapus DataTable yang lama dan buat ulang dengan filter yang baru
+                $('#dataTable').DataTable().ajax.reload();
+            });
         });
     </script>
     <script>
+        $(document).ready(function() {
+            // Function to update charts when the filter changes
+            function updateChartData() {
+                var customer = $('#customer').val();
+                var year = $('#tahun').val();
+
+                // Send AJAX request to update data
+                $.ajax({
+                    url: "{{ route('dashboard.update-chart-data-claim') }}", // Ganti dengan route yang sesuai
+                    type: "GET",
+                    data: {
+                        customer: customer,
+                        tahun: year
+                    },
+                    success: function(response) {
+                        // Update the chart data with the response
+                        // UPDATE JUDUL CHART
+                        $('#ppmTrendTitle').text('PPM Trend ' + response.year);
+                        $('#ngDistributionTitle').text('NG Distribution ' + response.year);
+                        // Update Cards
+                        $('#total-delivery').text(response.totalDelivery);
+                        $('#total-ng-items').text(response.totalNG);
+                        $('#delivery-year, #ng-year').text(response.year);
+                        updatePPMChart(response.ppmOfficialData, response.ppmNonOfficialData, response
+                            .targetPPMData);
+                        updateNGChart(response.ngOfficialData, response.ngNonOfficialData);
+                    }
+                });
+            }
+
+            $(document).ready(updateChartData);
+            // Trigger update when filter changes
+            $('#customer, #tahun').on('change', function() {
+                updateChartData();
+            });
+
+            function updatePPMChart(ppmOfficialData, ppmNonOfficialData, targetPPMData) {
+                // Update PPM Chart Data
+                ppmTrendChart.updateOptions({
+                    series: [{
+                        name: 'PPM Official',
+                        data: Object.values(ppmOfficialData)
+                    }, {
+                        name: 'PPM Non-Official',
+                        data: Object.values(ppmNonOfficialData),
+                        color: '#FF69B4' // Tomato color for PPM Non-Official
+                    }, {
+                        name: 'Target PPM',
+                        data: Object.values(targetPPMData),
+                        color: '#FFD700', // Gold color for Target PPM
+                    }]
+                });
+            }
+
+            function updateNGChart(ngOfficialData, ngNonOfficialData) {
+                // Update NG Distribution Chart Data
+                ngDistributionChart.updateOptions({
+                    series: [{
+                        name: 'NG Official',
+                        data: ngOfficialData
+                    }, {
+                        name: 'NG Non-Official',
+                        data: ngNonOfficialData,
+                        color: '#FF69B4'
+                    }]
+                });
+            }
+
+        });
+    </script>
+
+    <script>
         // PPM Trend Data
-        var ppmOfficialData = @json($ppmOfficialData); // Get the PPM Official data from PHP to JavaScript
+        var ppmOfficialData = @json($ppmOfficialData); // [0.41, 0.32, ...]
+        var ppmNonOfficialData = @json($ppmNonOfficialData);
         var bulanLabels = @json($bulanLabels);
         var dataTargetPPM = @json($targetPPMData);
+
+        // Chart options for PPM trend
         var ppmTrendOptions = {
             series: [{
                 name: 'PPM Official',
                 data: Object.values(ppmOfficialData)
+            }, {
+                name: 'PPM Non-Official',
+                data: Object.values(ppmNonOfficialData),
+                color: '#FF69B4' // Tomato color for PPM Non-Official
             }, {
                 name: 'Target PPM',
                 data: Object.values(dataTargetPPM),
@@ -277,9 +423,9 @@
                 }
             },
             stroke: {
-                width: [4, 4],
-                curve: 'smooth', // Smooth lines for both series
-                dashArray: [0, 5] // No dash for PPM Official, dash for Target PPM
+                width: [4, 4, 4],
+                curve: 'smooth', // Smooth lines for all series
+                dashArray: [0, 0, 5] // Solid line for PPM Official and Target PPM, dashed for PPM Non-Official
             },
             title: {
                 text: 'Trend PPM per Bulan', // Title for the chart
@@ -295,13 +441,13 @@
             },
             yAxis: {
                 title: {
-                    text: null // hilangkan label
+                    text: null // Hide Y-axis label
                 },
                 labels: {
-                    enabled: false // hilangkan angka/label Y-axis
+                    enabled: false // Hide Y-axis labels
                 },
-                lineWidth: 0, // hilangkan garis axis
-                tickLength: 0 // hilangkan tanda tick
+                lineWidth: 0, // Hide the axis line
+                tickLength: 0 // Hide tick marks
             },
             markers: {
                 size: 5 // Set the marker size for each data point
@@ -317,9 +463,13 @@
                     radius: 0, // Square shape for the legend markers
                     strokeWidth: 2, // Border width around markers
                     strokeColor: '#fff', // White border around markers
-                    fillColors: ['#1E90FF', '#FFD700'], // Colors for PPM Official and Target PPM
+                    fillColors: ['#1E90FF', '#FF6347',
+                        '#FFD700'
+                    ], // Colors for PPM Official, Non-Official, and Target PPM
                     shape: 'rectangle', // Square markers for the legend
-                    dashArray: [0, 5] // Solid line for PPM Official, dashed for Target PPM
+                    dashArray: [0, 5,
+                        0
+                    ] // Solid line for PPM Official, dashed for PPM Non-Official, solid for Target PPM
                 }
             },
             grid: {
@@ -341,6 +491,7 @@
 
         var ppmTrendChart = new ApexCharts(document.querySelector("#ppmTrendChart"), ppmTrendOptions);
         ppmTrendChart.render();
+
 
 
         var ngOfficialData = @json($ngOfficialData); // Data NG Official

@@ -181,13 +181,17 @@
                                 <div class="round-16 d-flex align-items-center justify-content-center">
                                     <i class="ti ti-circle"></i>
                                 </div>
-                                <span class="hide-menu">Data Audit</span>
+                                <span class="hide-menu">Customer Audit</span>
                             </a>
                         </li>
                     </ul>
                 </li>
                 <!-- Users Management -->
                 @if (Auth::user() && Auth::user()->role === 'superadmin')
+                    <li class="nav-small-cap">
+                        <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                        <span class="hide-menu">user</span>
+                    </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
                             <span><i class="ti ti-users"></i></span>

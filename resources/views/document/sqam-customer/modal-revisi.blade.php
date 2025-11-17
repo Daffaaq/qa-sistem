@@ -45,6 +45,18 @@
                         <div class="invalid-feedback" id="error-file_document"></div>
                     </div>
 
+                    <!-- KETERANGAN LAMA (READONLY) -->
+                    <div class="mb-3">
+                        <label class="form-label">Keterangan Revisi Saat Ini</label>
+                        <div id="revisi_keterangan_display" class="form-control bg-light text-dark"
+                            style="min-height: 80px; padding: 10px; white-space: pre-wrap; font-size: 0.95rem; line-height: 1.5; border: 1px solid #dee2e6; border-radius: 0.375rem;">
+                            —
+                        </div>
+                        <small class="form-text text-muted mt-1">
+                            Keterangan ini hanya untuk referensi. Tidak dapat diubah saat revisi.
+                        </small>
+                    </div>
+
                     <!-- File Preview for previous document (using canvas) -->
                     <div class="mb-3" id="revisi-file-preview" style="display: none;">
                         <label class="form-label">File Sebelumnya:</label>
@@ -80,9 +92,10 @@
 
 
 @push('scripts')
-    <script>
+    <script type="module">
         window.BASE_URL = "{{ asset('documents/sqam-customer') }}";
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        import * as pdfjsLib from '{{ route('pdf.module', ['file' => 'pdf']) }}';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '{{ route('pdf.worker', ['file' => 'pdf']) }}';
 
         let pdfDocRevisiSQAM = null;
         let currentPageRevisiSQAM = 1;
@@ -157,9 +170,10 @@
                 $('#revisi_document_id').val(data.id);
                 $('#revisi_title_document').val(data.title_document);
                 $('#revisi_category_document').val(data.category_document);
+                $('#revisi_keterangan_display').text(data.keterangan || '—');
 
                 currentPdfRevisiUrl = data.file_document ? `${window.BASE_URL}/${data.file_document}` :
-                null;
+                    null;
 
                 $('#formRevisiSQAMCustomer').attr('action',
                     `{{ route('sqam-customer.storeRevisi', ':id') }}`.replace(':id', data.id));

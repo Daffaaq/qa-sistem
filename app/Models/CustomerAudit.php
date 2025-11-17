@@ -32,4 +32,9 @@ class CustomerAudit extends Model
     {
         return substr($value, 0, 8); // Format: HH:mm:ss
     }
+
+    public function dataAudit()
+    {
+        return $this->hasMany(DataAudit::class, 'customer_audits_id', 'id');
+    }
 }
