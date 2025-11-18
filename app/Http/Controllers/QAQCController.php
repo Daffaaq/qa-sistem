@@ -13,6 +13,7 @@ use App\Models\Sop;
 use App\Models\SopHistorie;
 use App\Models\Wi;
 use App\Models\WiHistorie;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -800,8 +801,13 @@ class QAQCController extends Controller
                     'title_document' => $h->title_document ?? '',
                     'keterangan' => $h->keterangan ?? '',
                     'file_document' => $h->file_document ? asset('documents/qa-qc/' . ltrim($h->file_document, '/')) : null,
-                    'date_document' => $h->date_document ?? '',
-                    'time_document' => $h->time_document ?? '',
+                    'date_document' => $h->date_document
+                        ? Carbon::parse($h->date_document)->format('Y-m-d')
+                        : '',
+
+                    'time_document' => $h->time_document
+                        ? Carbon::parse($h->time_document)->format('H:i:s')
+                        : '',
                     'is_active' => (int) $h->is_active,
                 ])->values(),
 
@@ -820,8 +826,13 @@ class QAQCController extends Controller
                             'title_document' => $h->title_document ?? '',
                             'keterangan' => $h->keterangan ?? '',
                             'file_document' => $h->file_document ? asset('documents/qa-qc/' . ltrim($h->file_document, '/')) : null,
-                            'date_document' => $h->date_document ?? '',
-                            'time_document' => $h->time_document ?? '',
+                            'date_document' => $h->date_document
+                                ? Carbon::parse($h->date_document)->format('Y-m-d')
+                                : '',
+
+                            'time_document' => $h->time_document
+                                ? Carbon::parse($h->time_document)->format('H:i:s')
+                                : '',
                             'is_active' => (int) $h->is_active,
                         ])->values(),
 
@@ -840,8 +851,13 @@ class QAQCController extends Controller
                                     'title_document' => $h->title_document ?? '',
                                     'keterangan' => $h->keterangan ?? '',
                                     'file_document' => $h->file_document ? asset('documents/qa-qc/' . ltrim($h->file_document, '/')) : null,
-                                    'date_document' => $h->date_document ?? '',
-                                    'time_document' => $h->time_document ?? '',
+                                    'date_document' => $h->date_document
+                                        ? Carbon::parse($h->date_document)->format('Y-m-d')
+                                        : '',
+
+                                    'time_document' => $h->time_document
+                                        ? Carbon::parse($h->time_document)->format('H:i:s')
+                                        : '',
                                     'is_active' => (int) $h->is_active,
                                 ])->values(),
                             ];
