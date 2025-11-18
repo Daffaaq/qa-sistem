@@ -18,6 +18,7 @@ class CustomerAudit extends Model
         'tanggal_mulai_event',
         'tanggal_selesai_event',
         'file_evident',
+        'logo_customer',
     ];
 
     // Mengatur tipe tanggal otomatis

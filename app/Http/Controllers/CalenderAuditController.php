@@ -48,6 +48,7 @@ class CalenderAuditController extends Controller
                 'backgroundColor' => $color,
                 'borderColor' => $color,
                 'textColor' => '#000',
+                'logo_customer' => $audit->logo_customer ? asset('documents/customer-audit/logo/' . $audit->logo_customer) : null, // tambah ini
                 'extendedProps' => [
                     'pastEvent' => $hasEnded,
                 ],

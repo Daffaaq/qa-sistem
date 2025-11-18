@@ -54,6 +54,13 @@
                             <div class="invalid-feedback" id="error-file_evident"></div>
                             <small class="form-text text-muted">Opsional, maksimal 2MB. Hanya format PDF.</small>
                         </div>
+
+                        <!-- logo_customer -->
+                        <div class="col-md-6">
+                            <label for="logo_customer" class="form-label">Logo Customer</label>
+                            <input type="file" name="logo_customer" id="logo_customer" class="form-control" accept=".jpg,.png,.jpeg">
+                            <div class="invalid-feedback" id="error-logo_customer"></div>
+                        </div>
                     </div>
                 </div>
 

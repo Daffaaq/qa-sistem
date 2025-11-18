@@ -164,19 +164,19 @@
                                 .replace(':id', id);
 
                             let addBtn = `
-        <a href="${url}" class="btn btn-sm btn-primary">
-            <i class="ti ti-plus"></i> Add Data Audit
-        </a>
-    `;
+                                            <a href="${url}" class="btn btn-sm btn-primary">
+                                                <i class="ti ti-plus"></i> Add Data Audit
+                                            </a>
+                                        `;
 
                             // Tombol expand hanya muncul kalau ada data audit
                             let expandBtn = '';
-                            if (row.has_audit) {
+                            if (parseInt(row.has_audit) > 0) {
                                 expandBtn = `
-            <button class="btn btn-sm btn-success btn-expand-data-audit" data-id="${id}">
-                <i class="ti ti-database"></i> Data Audit
-            </button>
-        `;
+                                                <button class="btn btn-sm btn-success btn-expand-data-audit" data-id="${id}">
+                                                    <i class="ti ti-database"></i> Data Audit
+                                                </button>
+                                            `;
                             }
 
                             return addBtn + expandBtn;
@@ -191,21 +191,21 @@
 
                             // Tombol Show tersedia untuk semua pengguna
                             buttons += `
-            <button class="btn btn-sm btn-info btn-show-customer-audit" data-id="${id}">
-                <i class="ti ti-eye"></i> Show
-            </button>
-        `;
+                                            <button class="btn btn-sm btn-info btn-show-customer-audit" data-id="${id}">
+                                                <i class="ti ti-eye"></i> Show
+                                            </button>
+                                        `;
 
                             // Tombol Edit dan Delete hanya untuk superadmin
                             if (window.USER_ROLE === 'superadmin') {
                                 buttons += `
-                <button class="btn btn-sm btn-warning btn-edit-customer-audit" data-id="${id}">
-                    <i class="ti ti-pencil"></i> Edit
-                </button>
-                <button class="btn btn-sm btn-danger btn-delete" data-id="${id}">
-                    <i class="ti ti-trash"></i> Hapus
-                </button>
-            `;
+                                                <button class="btn btn-sm btn-warning btn-edit-customer-audit" data-id="${id}">
+                                                    <i class="ti ti-pencil"></i> Edit
+                                                </button>
+                                                <button class="btn btn-sm btn-danger btn-delete" data-id="${id}">
+                                                    <i class="ti ti-trash"></i> Hapus
+                                                </button>
+                                            `;
                             }
 
                             return buttons;

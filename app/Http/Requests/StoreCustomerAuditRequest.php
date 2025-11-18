@@ -29,6 +29,7 @@ class StoreCustomerAuditRequest extends FormRequest
             'tanggal_selesai_event' => 'nullable|date|after_or_equal:tanggal_mulai_event',
             'deskripsi_event' => 'required|string|max:1000',
             'file_evident' => 'nullable|file|mimes:pdf|max:2048',
+            'logo_customer' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
         ];
     }
 

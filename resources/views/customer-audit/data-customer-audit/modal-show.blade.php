@@ -29,6 +29,12 @@
                     <p id="view_deskripsi_event"></p>
                 </div>
 
+                <div class="mb-3 text-center" id="view_logo_customer_wrapper" style="display: none;">
+                    <img id="view_logo_customer" src="" alt="Logo Customer"
+                        style="width:50px; height:50px; border-radius:50%; object-fit:cover; background:#fff; padding:5px; box-shadow: 0 0 5px rgba(0,0,0,0.2);">
+                </div>
+
+
                 <div class="mb-3" id="current-file-info-show" style="display: none;">
                     <label class="form-label">Preview File Saat Ini:</label>
                     <div id="file-preview-view-customer-audit"
@@ -65,6 +71,7 @@
     <script type="module">
         import * as pdfjsLib from '{{ route('pdf.module', ['file' => 'pdf']) }}';
         window.BASE_URL = "{{ asset('documents/customer-audit') }}"; // Path to files
+        window.LOGO_URL = "{{ asset('documents/customer-audit/logo') }}";
         window.customerAuditShowRoute = "{{ route('customer-audit.show', ':id') }}";
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = '{{ route('pdf.worker', ['file' => 'pdf']) }}';
@@ -144,6 +151,30 @@
                 currentPageViewCustomerAudit + 1);
         });
 
+        function showCurrentLogo(logoPath) {
+            if (logoPath) {
+                const fullUrl = `${window.LOGO_URL}/${logoPath}`;
+                console.log('Trying to load logo:', fullUrl);
+
+                const imgTest = new Image();
+                imgTest.onload = function() {
+                    console.log('Logo berhasil dimuat!');
+                    $('#view_logo_customer').attr('src', fullUrl);
+                    // PAKSA TAMPILKAN WRAPPER DENGAN CSS LANGSUNG → 100% KELIHATAN
+                    $('#view_logo_customer_wrapper')
+                        .css('display', 'block')
+                        .show();
+                };
+                imgTest.onerror = function() {
+                    console.error('GAGAL memuat logo:', fullUrl);
+                    $('#view_logo_customer_wrapper').hide();
+                };
+                imgTest.src = fullUrl;
+
+            } else {
+                $('#view_logo_customer_wrapper').hide();
+            }
+        }
         // Open the modal to show customer audit info
         $(document).on('click', '.btn-show-customer-audit', function(e) {
             e.preventDefault();
@@ -165,6 +196,9 @@
                     $('#view_deskripsi_event').html(data.deskripsi_event);
                 }
                 console.log(data.file_evident);
+                console.log(data.logo_customer);
+                // Logo customer
+                showCurrentLogo(data.logo_customer);
                 // Check if file_evident exists
                 if (data.file_evident) {
                     const fileUrl = `${window.BASE_URL}/${data.file_evident}`; // Construct the file URL

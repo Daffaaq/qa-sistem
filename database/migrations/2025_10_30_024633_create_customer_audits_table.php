@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('tanggal_mulai_event');
             $table->date('tanggal_selesai_event')->nullable();
             $table->string('file_evident')->nullable();
+            $table->string('logo_customer')->nullable();
             $table->timestamps();
         });
     }

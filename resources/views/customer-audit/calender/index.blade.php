@@ -45,6 +45,7 @@
     </div>
     @include('customer-audit.calender.modal-create')
     @include('customer-audit.calender.modal-show')
+    @include('customer-audit.calender.modal-calender')
 @endsection
 
 @push('styles')
@@ -252,11 +253,39 @@
                 headerToolbar: {
                     start: 'prev,next today',
                     center: 'title',
-                    end: 'dayGridMonth'
+                    end: 'dayGridMonth lihatButton'
                 },
                 selectable: true,
+                customButtons: {
+                    lihatButton: {
+                        text: 'Lihat',
+                        click: function() {
+                            $('#modalBigCalendar').modal('show');
+                            setTimeout(renderBigCalendar, 200);
+                        }
+                    }
+                },
                 events: @json($events),
+                eventContent(arg) {
+                    let logo = arg.event.extendedProps.logo_customer;
 
+                    return {
+                        html: `
+                                <div style="text-align:center; display:flex; flex-direction:column; align-items:center;">
+                                    ${logo ? `
+                                                                                <img src="${logo}"
+                                                                                    style="
+                                                                                        height:20px;
+                                                                                        object-fit:fill;
+                                                                                        margin-bottom:2px;
+                                                                                    "
+                                                                                >
+                                                                            ` : ''}
+                                    <span style="font-size:11px;">${arg.event.title}</span>
+                                </div>
+                            `
+                    };
+                },
                 // Event when a date is clicked
                 dateClick: function(info) {
                     // Tanggal yang dipilih

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCustomerAuditRequest;
 use App\Models\CustomerAudit;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
@@ -87,13 +88,21 @@ class CustomerAuditController extends Controller
                 $file->move(public_path('documents/customer-audit'), $filename);
             }
 
-            $customerAudit = DB::transaction(function () use ($request, $filename) {
+            $logoFilename = null;
+            if ($request->hasFile('logo_customer')) {
+                $logoFile = $request->file('logo_customer');
+                $logoFilename = Str::random(40) . '.' . $logoFile->getClientOriginalExtension();
+                $logoFile->move(public_path('documents/customer-audit/logo'), $logoFilename);
+            }
+
+            $customerAudit = DB::transaction(function () use ($request, $filename, $logoFilename) {
                 return CustomerAudit::create([
                     'nama_event' => $request->nama_event,
                     'tanggal_mulai_event' => $request->tanggal_mulai_event,
                     'tanggal_selesai_event' => $request->tanggal_selesai_event ?? null,
                     'deskripsi_event' => $request->deskripsi_event,
-                    'file_evident' => $filename
+                    'file_evident' => $filename,
+                    'logo_customer' => $logoFilename
                 ]);
             });
 
@@ -117,14 +126,15 @@ class CustomerAuditController extends Controller
             // Ensure the date is formatted as yyyy-mm-dd
             $customerAudit->tanggal_mulai_event = \Carbon\Carbon::parse($customerAudit->tanggal_mulai_event)->format('Y-m-d');
             $customerAudit->tanggal_selesai_event = $customerAudit->tanggal_selesai_event ? \Carbon\Carbon::parse($customerAudit->tanggal_selesai_event)->format('Y-m-d') : null;
-
+            // dd($customerAudit);
             return response()->json([
                 'id' => $customerAudit->id,
                 'nama_event' => $customerAudit->nama_event,
                 'tanggal_mulai_event' => $customerAudit->tanggal_mulai_event,
                 'tanggal_selesai_event' => $customerAudit->tanggal_selesai_event,
                 'deskripsi_event' => $customerAudit->deskripsi_event,
-                'file_evident' => $customerAudit->file_evident
+                'file_evident' => $customerAudit->file_evident,
+                'logo_customer' => $customerAudit->logo_customer
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -146,21 +156,21 @@ class CustomerAuditController extends Controller
         try {
             $customerAudit = CustomerAudit::findOrFail($id);
 
-            // Ensure the date is formatted as yyyy-mm-dd
-            $customerAudit->tanggal_mulai_event = \Carbon\Carbon::parse($customerAudit->tanggal_mulai_event)->format('Y-m-d');
-            $customerAudit->tanggal_selesai_event = $customerAudit->tanggal_selesai_event ? \Carbon\Carbon::parse($customerAudit->tanggal_selesai_event)->format('Y-m-d') : null;
             return response()->json([
-                'id' => $customerAudit->id,
-                'nama_event' => $customerAudit->nama_event,
-                'tanggal_mulai_event' => $customerAudit->tanggal_mulai_event,
-                'tanggal_selesai_event' => $customerAudit->tanggal_selesai_event,
-                'deskripsi_event' => $customerAudit->deskripsi_event,
-                'file_evident' => $customerAudit->file_evident
+                'id'                  => $customerAudit->id,
+                'nama_event'          => $customerAudit->nama_event,
+                'tanggal_mulai_event' => Carbon::parse($customerAudit->tanggal_mulai_event)->format('Y-m-d'),
+                'tanggal_selesai_event' => $customerAudit->tanggal_selesai_event
+                    ? Carbon::parse($customerAudit->tanggal_selesai_event)->format('Y-m-d')
+                    : null,
+                'deskripsi_event'     => $customerAudit->deskripsi_event,
+                'file_evident'        => $customerAudit->file_evident,
+                'logo_customer'       => $customerAudit->logo_customer
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status'  => 'error',
-                'message' => 'Data claim tidak ditemukan.',
+                'message' => 'Data tidak ditemukan.',
                 'error'   => $e->getMessage()
             ], 404);
         }
@@ -199,13 +209,30 @@ class CustomerAuditController extends Controller
                 $file->move(public_path('documents/customer-audit'), $filename);
             }
 
+            $logoFilename = $customerAudit->logo_customer; // keep existing logo by default
+            if ($request->hasFile('logo_customer')) {
+                // Delete old logo if exists
+                if ($customerAudit->logo_customer) {
+                    $oldLogoPath = public_path('documents/customer-audit/logo/' . $customerAudit->logo_customer);
+                    if (file_exists($oldLogoPath)) {
+                        unlink($oldLogoPath);
+                    }
+                }
+
+                // Upload new logo
+                $logoFile = $request->file('logo_customer');
+                $logoFilename = Str::random(40) . '.' . $logoFile->getClientOriginalExtension();
+                $logoFile->move(public_path('documents/customer-audit/logo'), $logoFilename);
+            }
+
             // Update the customer audit record
             $customerAudit->update([
                 'nama_event' => $request->nama_event,
                 'tanggal_mulai_event' => $request->tanggal_mulai_event,
                 'tanggal_selesai_event' => $request->tanggal_selesai_event ?? null,
                 'deskripsi_event' => $request->deskripsi_event,
-                'file_evident' => $filename
+                'file_evident' => $filename,
+                'logo_customer' => $logoFilename
             ]);
 
             // Return success response
@@ -243,6 +270,15 @@ class CustomerAuditController extends Controller
                     unlink($filePath);
                 }
             }
+
+            // Hapus logo_customer
+            if (!empty($customerAudit->logo_customer)) {
+                $logoPath = public_path('documents/customer-audit/logo/' . $customerAudit->logo_customer);
+                if (file_exists($logoPath) && is_file($logoPath)) {
+                    unlink($logoPath);
+                }
+            }
+
 
             // Hapus file-data audit terkait
             foreach ($customerAudit->dataAudit as $dataAudit) {
